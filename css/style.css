@@ -407,11 +407,16 @@ section[id] {
   fill: var(--accent);
 }
 
-.schematic-nodes text {
-  fill: var(--text-secondary);
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
+.schematic-legend {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1.25rem;
+}
+
+.schematic-legend span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
 }
 
 /* ====== LOCAL-FIRST ====== */

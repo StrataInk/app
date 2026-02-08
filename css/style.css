@@ -170,7 +170,7 @@ section[id] {
 
 /* ====== HERO ====== */
 .hero {
-  padding: 8rem 0 6rem;
+  padding: 8rem 0 4rem;
   text-align: center;
 }
 
@@ -204,6 +204,97 @@ section[id] {
 .hero-subtext {
   font-size: 0.9375rem;
   color: var(--text-secondary);
+}
+
+/* ====== HERO MOCKUP ====== */
+.mockup {
+  margin-top: 4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mockup-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background-color: #1e222a;
+  border-bottom: 1px solid var(--border);
+}
+
+.mockup-chrome span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--border);
+}
+
+.mockup-canvas {
+  display: flex;
+  aspect-ratio: 5 / 2;
+  background-color: #252a33;
+}
+
+.mockup-panel {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mockup-panel--nav {
+  width: 20%;
+  border-right: 1px solid var(--border);
+  background-color: #282d37;
+}
+
+.mockup-panel--main {
+  flex: 1;
+  padding: 20px 24px;
+}
+
+.mockup-panel--aside {
+  width: 20%;
+  border-left: 1px solid var(--border);
+  background-color: #282d37;
+}
+
+/* Abstract content bars */
+.m-bar {
+  height: 6px;
+  border-radius: 3px;
+  background-color: #3b4252;
+}
+
+.m-active {
+  background-color: rgba(129, 161, 193, 0.25);
+}
+
+/* Abstract text lines */
+.m-line {
+  height: 4px;
+  border-radius: 2px;
+  background-color: #353a47;
+}
+
+.m-heading {
+  height: 7px;
+  border-radius: 3px;
+  background-color: #414a5c;
+}
+
+/* Abstract metadata labels */
+.m-tag {
+  height: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(129, 161, 193, 0.15);
+}
+
+/* Paragraph gap spacer */
+.m-gap {
+  height: 8px;
 }
 
 /* ====== PURPOSE ====== */
@@ -278,6 +369,33 @@ section[id] {
   color: var(--text-muted);
 }
 
+/* ====== STRUCTURE SCHEMATIC ====== */
+.schematic-wrap {
+  max-width: 480px;
+  margin: 0 auto 2.5rem;
+}
+
+.schematic {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.schematic-lines line {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.schematic-nodes circle {
+  fill: var(--accent);
+}
+
+.schematic-nodes text {
+  fill: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+}
+
 /* ====== LOCAL-FIRST ====== */
 .local {
   padding: var(--section-padding);
@@ -346,7 +464,7 @@ section[id] {
   }
 
   .hero {
-    padding: 5rem 0 4rem;
+    padding: 5rem 0 3rem;
   }
 
   .hero-title {
@@ -355,6 +473,18 @@ section[id] {
 
   .hero-headline {
     font-size: 1.125rem;
+  }
+
+  .mockup {
+    margin-top: 3rem;
+  }
+
+  .mockup-panel--aside {
+    display: none;
+  }
+
+  .mockup-panel--nav {
+    width: 28%;
   }
 
   .purpose,
@@ -372,6 +502,10 @@ section[id] {
 
   .structure-grid {
     grid-template-columns: 1fr;
+  }
+
+  .schematic-wrap {
+    max-width: 100%;
   }
 
   .footer .container {

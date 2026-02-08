@@ -20,6 +20,7 @@
   --max-width: 1000px;
   --prose-width: 66ch;
   --section-padding: 7rem 0;
+  --topbar-height: 49px;
 
   --grid-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M 48 0 L 0 0 0 48' fill='none' stroke='%23d8dee9' stroke-opacity='0.03' stroke-width='1'/%3E%3C/svg%3E");
 }
@@ -124,14 +125,20 @@ a:hover {
   background-size: 48px 48px;
 }
 
-/* Scroll offset for anchor links */
+/* Scroll offset for anchor links — clears the sticky topbar + breathing room */
 section[id] {
-  scroll-margin-top: 2rem;
+  scroll-margin-top: calc(var(--topbar-height) + 2rem);
 }
 
 /* ====== TOPBAR ====== */
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   padding: 1rem 0;
+  background-color: var(--bg-primary);
+  background-image: var(--grid-texture);
+  background-size: 48px 48px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -170,7 +177,7 @@ section[id] {
 
 /* ====== HERO ====== */
 .hero {
-  padding: 8rem 0 4rem;
+  padding: 8rem 0 5rem;
   text-align: center;
 }
 
@@ -208,7 +215,7 @@ section[id] {
 
 /* ====== HERO MOCKUP ====== */
 .mockup {
-  margin-top: 4rem;
+  margin-top: 5rem;
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
@@ -297,6 +304,14 @@ section[id] {
   height: 8px;
 }
 
+/* Mockup base line — subtle shelf beneath the window */
+.mockup-base {
+  width: 50%;
+  height: 1px;
+  background-color: var(--border);
+  margin: 1.5rem auto 0;
+}
+
 /* ====== PURPOSE ====== */
 .purpose {
   padding: var(--section-padding);
@@ -371,8 +386,10 @@ section[id] {
 
 /* ====== STRUCTURE SCHEMATIC ====== */
 .schematic-wrap {
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto 2.5rem;
+  padding: 2.5rem 2rem;
+  border: 1px solid var(--border);
 }
 
 .schematic {
@@ -382,7 +399,7 @@ section[id] {
 }
 
 .schematic-lines line {
-  stroke: var(--border);
+  stroke: var(--border-hover);
   stroke-width: 1;
 }
 
@@ -391,9 +408,10 @@ section[id] {
 }
 
 .schematic-nodes text {
-  fill: var(--text-muted);
+  fill: var(--text-secondary);
   font-family: 'Inter', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* ====== LOCAL-FIRST ====== */
@@ -506,6 +524,7 @@ section[id] {
 
   .schematic-wrap {
     max-width: 100%;
+    padding: 2rem 1rem;
   }
 
   .footer .container {

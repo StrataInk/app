@@ -240,7 +240,7 @@
   font-weight: 600;
 }
 
-.section-tab.active::after {
+.section-tab::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -249,6 +249,12 @@
   height: 2px;
   background-color: var(--accent);
   border-radius: 1px 1px 0 0;
+  transform: scaleX(0);
+  transition: transform 150ms ease;
+}
+
+.section-tab.active::after {
+  transform: scaleX(1);
 }
 
 /* ── Note List (Column 2) — Inkdrop compact list ──── */
@@ -706,10 +712,34 @@
   gap: 4px;
 }
 
+.editor-header-divider {
+  width: 1px;
+  height: 18px;
+  background-color: var(--border);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+
 .editor-header-right {
   display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.signal-group {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
+}
+
+.signal-label {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  line-height: 1;
 }
 
 .editor-action-btn {
@@ -754,6 +784,7 @@
   color: var(--accent-yellow);
   background-color: var(--accent-yellow-muted);
   border-color: rgba(226, 200, 122, 0.15);
+  box-shadow: 0 0 0 1px rgba(226, 200, 122, 0.2);
 }
 
 .signal-structure[data-structure="thought"],
@@ -762,6 +793,7 @@
   color: var(--accent-pink);
   background-color: var(--accent-pink-muted);
   border-color: rgba(201, 135, 154, 0.15);
+  box-shadow: 0 0 0 1px rgba(201, 135, 154, 0.2);
 }
 
 .signal-structure:hover {
@@ -796,22 +828,34 @@
 }
 
 .editor-header-notebook {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 2px 1px 8px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
   flex-shrink: 0;
 }
 
-.editor-notebook-input {
-  padding: 3px 8px;
-  background-color: var(--bg-input);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  color: var(--text-secondary);
-  font-size: 11px;
-  width: 140px;
-  outline: none;
+.notebook-chip-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  display: flex;
 }
 
-.editor-notebook-input:focus {
-  border-color: rgba(129, 161, 193, 0.25);
+.editor-notebook-input {
+  padding: 2px 4px;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  width: 120px;
+}
+
+.editor-notebook-input::placeholder {
+  color: var(--text-muted);
 }
 
 /* ── Structure-Driven Editor Behavior ─────────────── */
@@ -905,7 +949,14 @@
 }
 
 .observe-section {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+}
+
+.observe-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
 }
 
 .observe-section h3 {
@@ -930,11 +981,12 @@
 }
 
 .observe-big-number {
-  font-size: 44px;
+  font-size: 48px;
   font-weight: 600;
   color: var(--text-heading);
   letter-spacing: -0.04em;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .observe-big-label {
@@ -951,8 +1003,22 @@
 .observe-bar-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
+
+.observe-bar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.observe-bar-dot[data-structure="thought"] { background-color: var(--signal-thought); }
+.observe-bar-dot[data-structure="idea"] { background-color: var(--signal-idea); }
+.observe-bar-dot[data-structure="question"] { background-color: var(--signal-question); }
+.observe-bar-dot[data-structure="decision"] { background-color: var(--signal-decision); }
+.observe-bar-dot[data-structure="system"] { background-color: var(--signal-system); }
+.observe-bar-dot[data-structure="insight"] { background-color: var(--signal-insight); }
 
 .observe-bar-label {
   width: 130px;
@@ -994,13 +1060,21 @@
 
 .observe-pressure-row {
   display: flex;
-  gap: 28px;
+  gap: 12px;
 }
 
 .observe-pressure-item {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.observe-pressure-card {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  flex: 1;
 }
 
 .observe-pressure-dot {
@@ -1027,6 +1101,13 @@
   color: var(--text-muted);
 }
 
+.observe-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  text-align: right;
+}
+
 /* ══════════════════════════════════════════════════════
    Settings View — OneNote-style two-column layout
    ══════════════════════════════════════════════════════ */
@@ -1047,6 +1128,26 @@
   border-right: 1px solid var(--border);
 }
 
+.settings-sidebar-group-label {
+  padding: 12px 16px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.settings-sidebar-group-label:first-child {
+  padding-top: 4px;
+}
+
+.settings-sidebar-footer {
+  margin-top: auto;
+  padding: 12px 16px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
 .settings-tab {
   display: flex;
   align-items: center;
@@ -1054,10 +1155,11 @@
   padding: 8px 16px;
   background: none;
   border: none;
+  border-left: 2px solid transparent;
   color: var(--text-muted);
   font-size: 12px;
   cursor: pointer;
-  transition: color var(--transition), background-color var(--transition);
+  transition: color var(--transition), background-color var(--transition), border-color var(--transition);
   text-align: left;
 }
 
@@ -1069,6 +1171,8 @@
 .settings-tab.active {
   background-color: var(--bg-surface-active);
   color: var(--text-primary);
+  border-left-color: var(--accent);
+  padding-left: 14px;
 }
 
 .settings-tab-icon {
@@ -1103,8 +1207,8 @@
 }
 
 .settings-panel-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text-heading);
   margin-bottom: 24px;
   padding-top: 24px;
@@ -1113,6 +1217,9 @@
 
 .settings-section {
   margin-bottom: 28px;
+  padding: 16px;
+  background-color: var(--bg-surface);
+  border-radius: 8px;
 }
 
 .settings-section-title {
@@ -1139,7 +1246,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   gap: 24px;
 }

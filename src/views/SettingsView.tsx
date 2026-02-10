@@ -55,7 +55,8 @@ export function SettingsView() {
   return (
     <div className="settings-layout">
       <div className="settings-sidebar">
-        {TABS.map(tab => (
+        <div className="settings-sidebar-group-label">Preferences</div>
+        {TABS.filter(t => t.id === 'general' || t.id === 'editor' || t.id === 'appearance').map(tab => (
           <button
             key={tab.id}
             className={`settings-tab ${activeTab === tab.id ? 'active' : ''}`}
@@ -66,6 +67,19 @@ export function SettingsView() {
             <ChevronRight size={12} className="settings-tab-arrow" />
           </button>
         ))}
+        <div className="settings-sidebar-group-label">System</div>
+        {TABS.filter(t => t.id === 'storage' || t.id === 'about').map(tab => (
+          <button
+            key={tab.id}
+            className={`settings-tab ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            <span className="settings-tab-icon">{tab.icon}</span>
+            <span className="settings-tab-label">{tab.label}</span>
+            <ChevronRight size={12} className="settings-tab-arrow" />
+          </button>
+        ))}
+        <div className="settings-sidebar-footer">StrataInk v1.0.0</div>
       </div>
 
       <div className="settings-content">

@@ -59,7 +59,7 @@ export function ObserveView({ entries }: ObserveViewProps) {
 
   return (
     <div className="observe">
-      <div className="observe-section">
+      <div className="observe-section observe-card">
         <h3>What you're carrying</h3>
         <div className="observe-summary">
           <span className="observe-big-number">{active.length}</span>
@@ -70,12 +70,13 @@ export function ObserveView({ entries }: ObserveViewProps) {
         </div>
       </div>
 
-      <div className="observe-section">
+      <div className="observe-section observe-card">
         <h3>Shape of your thinking</h3>
         <p className="observe-insight">{shapeSummary(structureCounts)}</p>
         <div className="observe-bars">
           {topStructures.map(s => (
             <div key={s} className="observe-bar-row">
+              <span className="observe-bar-dot" data-structure={s} />
               <span className="observe-bar-label">{STRUCTURE_LABELS[s]}</span>
               <div className="observe-bar-track">
                 <div
@@ -90,26 +91,27 @@ export function ObserveView({ entries }: ObserveViewProps) {
         </div>
       </div>
 
-      <div className="observe-section">
+      <div className="observe-section observe-card">
         <h3>Weight</h3>
         <p className="observe-insight">{pressureSummary(pressureCounts)}</p>
         <div className="observe-pressure-row">
-          <div className="observe-pressure-item">
+          <div className="observe-pressure-item observe-pressure-card">
             <span className="observe-pressure-dot" data-pressure="low" />
             <span className="observe-pressure-count">{pressureCounts.low}</span>
             <span className="observe-pressure-label">low</span>
           </div>
-          <div className="observe-pressure-item">
+          <div className="observe-pressure-item observe-pressure-card">
             <span className="observe-pressure-dot" data-pressure="medium" />
             <span className="observe-pressure-count">{pressureCounts.medium}</span>
             <span className="observe-pressure-label">medium</span>
           </div>
-          <div className="observe-pressure-item">
+          <div className="observe-pressure-item observe-pressure-card">
             <span className="observe-pressure-dot" data-pressure="high" />
             <span className="observe-pressure-count">{pressureCounts.high}</span>
             <span className="observe-pressure-label">high</span>
           </div>
         </div>
+        <p className="observe-meta">Based on {active.length} active {active.length === 1 ? 'entry' : 'entries'}</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { Plus, Pin, PinOff, Trash2 } from 'lucide-react';
 import type { EntryMeta } from '../types';
 import type { SidebarFilter } from './Sidebar';
@@ -39,6 +39,12 @@ function formatDate(iso: string): string {
 }
 
 export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin, onTrash, filter }: NoteListProps) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: 0 });
+  }, [entries]);
+
   const sorted = useMemo(() => {
     return [...entries].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
@@ -63,7 +69,7 @@ export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin
           )}
         </div>
       </div>
-      <div className="notelist-body">
+      <div className="notelist-body" ref={bodyRef}>
         {sorted.length === 0 ? (
           <div className="empty" style={{ minHeight: 200 }}>
             <p>

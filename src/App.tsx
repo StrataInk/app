@@ -36,6 +36,11 @@ export default function App() {
     setSelectedSection(null);
   };
 
+  // Clear editor when section changes so page list feels fresh
+  useEffect(() => {
+    setActiveEntry(null);
+  }, [selectedSection]);
+
   // ── Ribbon State ─────────────────────────────────────────────────────
   const [ribbonTab, setRibbonTab] = useState<RibbonTab>('home');
   const [ribbonCollapsed, setRibbonCollapsed] = useState(true);
@@ -112,7 +117,7 @@ export default function App() {
     }
 
     // Apply notebook/section hierarchy filter
-    if (selectedNotebook && (filter.type === 'all' || filter.type === 'pinned')) {
+    if (selectedNotebook && (filter.type === 'all' || filter.type === 'pinned' || filter.type === 'archive')) {
       base = base.filter(e => {
         const { notebook, section } = parseNotebookPath(e.notebook);
         if (notebook !== selectedNotebook) return false;

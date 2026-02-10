@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, type KeyboardEvent } from 'react';
-import { Pin, PinOff, Trash2, RotateCcw, X } from 'lucide-react';
+import { Pin, PinOff, Trash2, RotateCcw, X, Book } from 'lucide-react';
 import { EditorView as CMEditorView } from '@codemirror/view';
 import type { Entry, Structure, Pressure } from '../types';
 import { MarkdownEditor, type EditorMode } from '../components/editor/MarkdownEditor';
@@ -292,30 +292,37 @@ export function EditorView({
               <Trash2 size={14} strokeWidth={1.5} />
             </button>
           </div>
+          <span className="editor-header-divider" />
           <div className="editor-header-right">
-            <button
-              className="signal-control signal-structure"
-              data-structure={structure}
-              onClick={() => {
-                const idx = STRUCTURES.indexOf(structure);
-                handleStructure(STRUCTURES[(idx + 1) % STRUCTURES.length]);
-              }}
-              title={`Structure: ${structure} (click to change)`}
-            >
-              {structure}
-            </button>
-            <button
-              className="signal-control signal-pressure"
-              data-pressure={pressure}
-              onClick={() => {
-                const idx = PRESSURES.indexOf(pressure);
-                handlePressure(PRESSURES[(idx + 1) % PRESSURES.length]);
-              }}
-              title={`Pressure: ${pressure} (click to change)`}
-            >
-              <span className="signal-pressure-dot" />
-              {pressure}
-            </button>
+            <div className="signal-group">
+              <span className="signal-label">Structure</span>
+              <button
+                className="signal-control signal-structure"
+                data-structure={structure}
+                onClick={() => {
+                  const idx = STRUCTURES.indexOf(structure);
+                  handleStructure(STRUCTURES[(idx + 1) % STRUCTURES.length]);
+                }}
+                title={`Structure: ${structure} (click to change)`}
+              >
+                {structure}
+              </button>
+            </div>
+            <div className="signal-group">
+              <span className="signal-label">Pressure</span>
+              <button
+                className="signal-control signal-pressure"
+                data-pressure={pressure}
+                onClick={() => {
+                  const idx = PRESSURES.indexOf(pressure);
+                  handlePressure(PRESSURES[(idx + 1) % PRESSURES.length]);
+                }}
+                title={`Pressure: ${pressure} (click to change)`}
+              >
+                <span className="signal-pressure-dot" />
+                {pressure}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -338,6 +345,7 @@ export function EditorView({
             />
           </div>
           <div className="editor-header-notebook">
+            <Book size={12} strokeWidth={1.5} className="notebook-chip-icon" />
             <input
               type="text"
               list="notebooks-list"

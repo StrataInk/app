@@ -133,6 +133,7 @@
 .md-editor-cm .cm-scroller {
   overflow: auto;
   font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+  font-size: var(--editor-font-size, 16px);
 }
 
 /* ── Preview ───────────────────────────────────────────────────── */
@@ -140,8 +141,9 @@
 .md-editor-preview {
   padding: 0 4px 48px;
   color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.75;
+  font-family: var(--editor-font-family, inherit);
+  font-size: var(--editor-font-size, 16px);
+  line-height: var(--editor-line-height, 1.75);
   cursor: default;
 }
 
@@ -358,4 +360,10 @@
   text-decoration-style: dotted;
   text-underline-offset: 2px;
   cursor: pointer;
+}
+
+.cm-wiki-link-missing {
+  color: var(--text-muted);
+  text-decoration-style: dashed;
+  opacity: 0.6;
 }

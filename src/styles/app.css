@@ -1778,3 +1778,21 @@
 .si-list-row.active {
   background-color: var(--bg-surface-active);
 }
+
+/* ── Debug Bar (dev only) ─────────────────────────── */
+
+.debug-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  gap: 16px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #88c0d0;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}

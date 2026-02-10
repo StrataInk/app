@@ -15,41 +15,45 @@ import {
 const WIKI_LINK_RE = /\[\[([^\]]+)\]\]/g;
 
 const wikiLinkMark = Decoration.mark({ class: 'cm-wiki-link' });
-
-function buildDecorations(view: EditorView): DecorationSet {
-  const builder = new RangeSetBuilder<Decoration>();
-  for (const { from, to } of view.visibleRanges) {
-    const text = view.state.sliceDoc(from, to);
-    WIKI_LINK_RE.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = WIKI_LINK_RE.exec(text)) !== null) {
-      const start = from + match.index;
-      const end = start + match[0].length;
-      builder.add(start, end, wikiLinkMark);
-    }
-  }
-  return builder.finish();
-}
-
-const wikiLinkDecorations = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet;
-    constructor(view: EditorView) {
-      this.decorations = buildDecorations(view);
-    }
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged) {
-        this.decorations = buildDecorations(update.view);
-      }
-    }
-  },
-  { decorations: (v) => v.decorations }
-);
+const wikiLinkMissingMark = Decoration.mark({ class: 'cm-wiki-link cm-wiki-link-missing' });
 
 export function wikiLinksExtension(
   getPageTitles: () => { title: string; id: string }[],
   onNavigate: (id: string) => void
 ) {
+  function buildDecorations(view: EditorView): DecorationSet {
+    const builder = new RangeSetBuilder<Decoration>();
+    const pages = getPageTitles();
+    for (const { from, to } of view.visibleRanges) {
+      const text = view.state.sliceDoc(from, to);
+      WIKI_LINK_RE.lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = WIKI_LINK_RE.exec(text)) !== null) {
+        const start = from + match.index;
+        const end = start + match[0].length;
+        const title = match[1];
+        const exists = pages.some(p => p.title.toLowerCase() === title.toLowerCase());
+        builder.add(start, end, exists ? wikiLinkMark : wikiLinkMissingMark);
+      }
+    }
+    return builder.finish();
+  }
+
+  const wikiLinkDecorations = ViewPlugin.fromClass(
+    class {
+      decorations: DecorationSet;
+      constructor(view: EditorView) {
+        this.decorations = buildDecorations(view);
+      }
+      update(update: ViewUpdate) {
+        if (update.docChanged || update.viewportChanged) {
+          this.decorations = buildDecorations(update.view);
+        }
+      }
+    },
+    { decorations: (v) => v.decorations }
+  );
+
   const wikiLinkCompletion = autocompletion({
     override: [
       (context: CompletionContext): CompletionResult | null => {

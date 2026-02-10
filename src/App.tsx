@@ -8,12 +8,14 @@ import { EditorView } from './views/EditorView';
 import { CommandPalette } from './components/CommandPalette';
 import { ObserveView } from './views/ObserveView';
 import { SettingsView } from './views/SettingsView';
-import type { EntryMeta, Entry } from './types';
+import { usePreferences } from './state/PreferencesContext';
+import type { EntryMeta, Entry, Structure, Pressure } from './types';
 import type { EditorMode } from './components/editor/MarkdownEditor';
 import { getSectionsForNotebook, parseNotebookPath, buildNotebookPath } from './utils/notebook-hierarchy';
 import { v4 as uuid } from 'uuid';
 
 export default function App() {
+  const { prefs } = usePreferences();
   const [view, setView] = useState<View>('notes');
   const [filter, setFilter] = useState<SidebarFilter>({ type: 'all' });
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,6 +25,7 @@ export default function App() {
   const [tags, setTags] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showDebugBar, setShowDebugBar] = useState(false);
 
   // ── Notebook / Section Hierarchy ──────────────────────────────────
   const [selectedNotebook, setSelectedNotebook] = useState<string | null>(null);
@@ -38,15 +41,10 @@ export default function App() {
     setSelectedSection(null);
   };
 
-  // Clear editor when section changes so page list feels fresh
-  useEffect(() => {
-    setActiveEntry(null);
-  }, [selectedSection]);
-
   // ── Ribbon State ─────────────────────────────────────────────────────
   const [ribbonTab, setRibbonTab] = useState<RibbonTab>('home');
   const [ribbonCollapsed, setRibbonCollapsed] = useState(true);
-  const [editorMode, setEditorMode] = useState<EditorMode>('write');
+  const [editorMode, setEditorMode] = useState<EditorMode>(prefs.editorModeDefault);
   const [drawingActive, setDrawingActive] = useState(false);
   const ribbonCommandRef = useRef<((cmd: RibbonCommand) => void) | null>(null);
 
@@ -143,11 +141,37 @@ export default function App() {
     });
   }, [filteredEntries]);
 
+  // ── Selection Guard ─────────────────────────────────────────────────
+  // If the active entry is no longer visible in the filtered list, clear it.
+  // This replaces the old aggressive `setActiveEntry(null)` on section change.
+
+  useEffect(() => {
+    if (activeEntry && sortedEntries.length >= 0) {
+      const stillVisible = sortedEntries.some(e => e.id === activeEntry.id);
+      if (!stillVisible) setActiveEntry(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortedEntries]);
+
   // ── Entry Actions ──────────────────────────────────────────────────
 
   const openEntry = async (id: string) => {
     const entry = await window.strata.readEntry(id);
     if (entry) {
+      // If entry is in a different notebook/section, switch context
+      if (entry.notebook) {
+        const { notebook, section } = parseNotebookPath(entry.notebook);
+        if (notebook !== selectedNotebook) {
+          setSelectedNotebook(notebook);
+          setSelectedSection(section || null);
+          // Ensure we're not stuck in a narrow filter
+          if (filter.type === 'notebook' || filter.type === 'tag') {
+            setFilter({ type: 'all' });
+          }
+        } else if (section && section !== selectedSection) {
+          setSelectedSection(section || null);
+        }
+      }
       setActiveEntry(entry);
     }
   };
@@ -165,8 +189,8 @@ export default function App() {
     const entry: Entry = {
       id: uuid(),
       title: '',
-      structure: 'thought',
-      pressure: 'low',
+      structure: prefs.defaultStructure as Structure,
+      pressure: prefs.defaultPressure as Pressure,
       pinned: false,
       archived: false,
       trashed: false,
@@ -181,7 +205,7 @@ export default function App() {
     setView('notes');
     await loadEntries();
     await loadMeta();
-  }, [filter, selectedNotebook, selectedSection, loadEntries, loadMeta]);
+  }, [filter, selectedNotebook, selectedSection, prefs.defaultStructure, prefs.defaultPressure, loadEntries, loadMeta]);
 
   const saveEntry = async (entry: Entry) => {
     await window.strata.writeEntry(entry);
@@ -234,8 +258,8 @@ export default function App() {
     const entry: Entry = {
       id: uuid(),
       title: '',
-      structure: 'thought',
-      pressure: 'low',
+      structure: prefs.defaultStructure as Structure,
+      pressure: prefs.defaultPressure as Pressure,
       pinned: false,
       archived: false,
       trashed: false,
@@ -249,7 +273,7 @@ export default function App() {
     await loadEntries();
     await loadMeta();
     setSelectedSection(sectionName.trim());
-  }, [selectedNotebook, loadEntries, loadMeta]);
+  }, [selectedNotebook, prefs.defaultStructure, prefs.defaultPressure, loadEntries, loadMeta]);
 
   const handleRenameSection = useCallback(async (oldName: string, newName: string) => {
     if (!selectedNotebook || !newName.trim() || oldName === newName) return;
@@ -259,7 +283,15 @@ export default function App() {
     if (selectedSection === oldName) {
       setSelectedSection(newName.trim());
     }
-  }, [selectedNotebook, selectedSection, loadEntries, loadMeta]);
+    // Fix: update activeEntry's notebook if it was in the renamed section
+    if (activeEntry) {
+      const oldPath = (!oldName || oldName === 'General') ? selectedNotebook : `${selectedNotebook}/${oldName}`;
+      const newPath = (!newName.trim() || newName.trim() === 'General') ? selectedNotebook : `${selectedNotebook}/${newName.trim()}`;
+      if (activeEntry.notebook === oldPath) {
+        setActiveEntry({ ...activeEntry, notebook: newPath });
+      }
+    }
+  }, [selectedNotebook, selectedSection, activeEntry, loadEntries, loadMeta]);
 
   // ── Page Reorder ──────────────────────────────────────────────────
 
@@ -313,6 +345,11 @@ export default function App() {
       } else if (mod && e.key === 'Tab') {
         e.preventDefault();
         navigateEntryList(e.shiftKey ? -1 : 1);
+      } else if (mod && e.shiftKey && e.key === 'D') {
+        if (import.meta.env.DEV) {
+          e.preventDefault();
+          setShowDebugBar(prev => !prev);
+        }
       }
     };
 
@@ -444,6 +481,16 @@ export default function App() {
           onNewPage={() => { setShowCommandPalette(false); createEntry(); }}
           onJumpToPage={(id) => { setShowCommandPalette(false); openEntry(id); }}
         />
+      )}
+      {import.meta.env.DEV && showDebugBar && (
+        <div className="debug-bar">
+          <span>notebook: {selectedNotebook ?? '(none)'}</span>
+          <span>section: {selectedSection ?? '(none)'}</span>
+          <span>active: {activeEntry?.id?.slice(0, 8) ?? '(none)'}</span>
+          <span>filter: {filter.type}{filter.type === 'notebook' || filter.type === 'tag' ? `:${filter.name}` : ''}</span>
+          <span>entries: {entries.length}</span>
+          <span>visible: {sortedEntries.length}</span>
+        </div>
       )}
     </div>
   );

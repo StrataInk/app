@@ -1,5 +1,5 @@
 /**
- * Web stub for window.strata — provides an in-memory demo backend
+ * Web stub for window.strata — provides a localStorage-backed demo backend
  * so the app is reviewable in a browser without Electron.
  */
 import type { Entry, EntryMeta, StrataAPI } from './types';
@@ -50,7 +50,23 @@ const DEMO_ENTRIES: Entry[] = [
   },
 ];
 
-let entries = [...DEMO_ENTRIES];
+// ── localStorage persistence ────────────────────────────────────────
+
+const ENTRIES_KEY = 'strata-entries';
+
+function loadStoredEntries(): Entry[] {
+  try {
+    const raw = localStorage.getItem(ENTRIES_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore corrupt data */ }
+  return [...DEMO_ENTRIES];
+}
+
+function persist() {
+  localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
+}
+
+let entries = loadStoredEntries();
 
 function toMeta(e: Entry): EntryMeta {
   const { body: _, ...meta } = e;
@@ -73,11 +89,12 @@ const stubAPI: StrataAPI = {
     } else {
       entries.unshift(entry);
     }
+    persist();
   },
 
   archiveEntry: async (id) => {
     const e = entries.find(x => x.id === id);
-    if (e) e.archived = true;
+    if (e) { e.archived = true; persist(); }
   },
 
   searchEntries: async (query) => {
@@ -93,26 +110,27 @@ const stubAPI: StrataAPI = {
 
   trashEntry: async (id) => {
     const e = entries.find(x => x.id === id);
-    if (e) e.trashed = true;
+    if (e) { e.trashed = true; persist(); }
   },
 
   restoreEntry: async (id) => {
     const e = entries.find(x => x.id === id);
-    if (e) e.trashed = false;
+    if (e) { e.trashed = false; persist(); }
   },
 
   deleteEntryPermanently: async (id) => {
     entries = entries.filter(e => e.id !== id);
+    persist();
   },
 
   pinEntry: async (id) => {
     const e = entries.find(x => x.id === id);
-    if (e) e.pinned = true;
+    if (e) { e.pinned = true; persist(); }
   },
 
   unpinEntry: async (id) => {
     const e = entries.find(x => x.id === id);
-    if (e) e.pinned = false;
+    if (e) { e.pinned = false; persist(); }
   },
 
   listNotebooks: async () => {
@@ -135,6 +153,7 @@ const stubAPI: StrataAPI = {
         count++;
       }
     }
+    if (count > 0) persist();
     return count;
   },
 
@@ -143,6 +162,7 @@ const stubAPI: StrataAPI = {
       const e = entries.find(x => x.id === id);
       if (e) e.sortOrder = sortOrder;
     }
+    persist();
   },
 
   getConnections: async () => [],

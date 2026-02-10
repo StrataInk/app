@@ -274,77 +274,84 @@ export function EditorView({
         autoFocus
       />
 
-      <div className="editor-chrome">
-        <div className="editor-meta">
-          <label>
-            Structure
-            <select value={structure} onChange={e => handleStructure(e.target.value as Structure)}>
-              {STRUCTURES.map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Pressure
-            <select value={pressure} onChange={e => handlePressure(e.target.value as Pressure)}>
-              {PRESSURES.map(p => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Notebook
+      <div className="editor-header">
+        <div className="editor-header-row">
+          <div className="editor-header-left">
+            <button
+              className="editor-action-btn"
+              onClick={() => entry.pinned ? onUnpin(entry.id) : onPin(entry.id)}
+              title={entry.pinned ? 'Unpin' : 'Pin'}
+            >
+              {entry.pinned ? <PinOff size={14} strokeWidth={1.5} /> : <Pin size={14} strokeWidth={1.5} />}
+            </button>
+            <button
+              className="editor-action-btn"
+              onClick={() => onTrash(entry.id)}
+              title="Move to trash"
+            >
+              <Trash2 size={14} strokeWidth={1.5} />
+            </button>
+          </div>
+          <div className="editor-header-right">
+            <button
+              className="signal-control signal-structure"
+              data-structure={structure}
+              onClick={() => {
+                const idx = STRUCTURES.indexOf(structure);
+                handleStructure(STRUCTURES[(idx + 1) % STRUCTURES.length]);
+              }}
+              title={`Structure: ${structure} (click to change)`}
+            >
+              {structure}
+            </button>
+            <button
+              className="signal-control signal-pressure"
+              data-pressure={pressure}
+              onClick={() => {
+                const idx = PRESSURES.indexOf(pressure);
+                handlePressure(PRESSURES[(idx + 1) % PRESSURES.length]);
+              }}
+              title={`Pressure: ${pressure} (click to change)`}
+            >
+              <span className="signal-pressure-dot" />
+              {pressure}
+            </button>
+          </div>
+        </div>
+
+        <div className="editor-header-row editor-header-tags">
+          <div className="tag-input-wrap">
+            {tags.map(tag => (
+              <span key={tag} className="tag-chip">
+                #{tag}
+                <span className="tag-chip-remove" onClick={() => removeTag(tag)}>&times;</span>
+              </span>
+            ))}
+            <input
+              className="tag-input"
+              type="text"
+              placeholder="Add tag..."
+              value={tagInput}
+              onChange={e => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+            />
+          </div>
+          <div className="editor-header-notebook">
             <input
               type="text"
               list="notebooks-list"
-              placeholder="None"
+              placeholder="No notebook"
               value={notebook}
               onChange={e => handleNotebook(e.target.value)}
+              className="editor-notebook-input"
             />
             <datalist id="notebooks-list">
               {notebooks.map(nb => (
                 <option key={nb} value={nb} />
               ))}
             </datalist>
-          </label>
-          <span style={{ flex: 1 }} />
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => entry.pinned ? onUnpin(entry.id) : onPin(entry.id)}
-          >
-            {entry.pinned ? <PinOff size={13} strokeWidth={1.5} /> : <Pin size={13} strokeWidth={1.5} />}
-            {entry.pinned ? 'Unpin' : 'Pin'}
-          </button>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => onTrash(entry.id)}
-          >
-            <Trash2 size={13} strokeWidth={1.5} />
-            Trash
-          </button>
-        </div>
-
-        <div className="editor-meta">
-          <label style={{ alignItems: 'flex-start' }}>
-            Tags
-            <div className="tag-input-wrap">
-              {tags.map(tag => (
-                <span key={tag} className="tag-chip">
-                  #{tag}
-                  <span className="tag-chip-remove" onClick={() => removeTag(tag)}>&times;</span>
-                </span>
-              ))}
-              <input
-                className="tag-input"
-                type="text"
-                placeholder="Add tag..."
-                value={tagInput}
-                onChange={e => setTagInput(e.target.value)}
-                onKeyDown={handleTagKeyDown}
-                onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
-              />
-            </div>
-          </label>
+          </div>
         </div>
       </div>
 

@@ -79,6 +79,7 @@ export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin
             <div
               key={entry.id}
               className={`note-card${activeId === entry.id ? ' selected' : ''}`}
+              data-structure={entry.structure}
               onClick={() => onSelect(entry.id)}
             >
               <div className="note-card-top">

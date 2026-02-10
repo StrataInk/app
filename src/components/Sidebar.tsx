@@ -1,4 +1,6 @@
 import type { RefObject } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { getUniqueNotebooks } from '../utils/notebook-hierarchy';
 
 export type View = 'notes' | 'observe' | 'settings';
 
@@ -21,6 +23,8 @@ interface SidebarProps {
   notebooks: string[];
   tags: string[];
   searchInputRef: RefObject<HTMLInputElement | null>;
+  selectedNotebook: string | null;
+  onNotebookSelect: (nb: string | null) => void;
 }
 
 function isFilterActive(current: SidebarFilter, check: SidebarFilter): boolean {
@@ -40,7 +44,10 @@ export function Sidebar({
   notebooks,
   tags,
   searchInputRef,
+  selectedNotebook,
+  onNotebookSelect,
 }: SidebarProps) {
+  const uniqueNotebooks = getUniqueNotebooks(notebooks);
   const handleSearch = (value: string) => {
     onSearchChange(value);
     if (value.trim()) {
@@ -59,7 +66,19 @@ export function Sidebar({
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">Strata</div>
+      <div className="sidebar-notebook-switcher">
+        <select
+          className="notebook-dropdown"
+          value={selectedNotebook ?? '__all__'}
+          onChange={e => onNotebookSelect(e.target.value === '__all__' ? null : e.target.value)}
+        >
+          <option value="__all__">All Notebooks</option>
+          {uniqueNotebooks.map(nb => (
+            <option key={nb} value={nb}>{nb}</option>
+          ))}
+        </select>
+        <ChevronDown size={12} className="notebook-dropdown-icon" />
+      </div>
 
       <div className="sidebar-search">
         <input
@@ -99,22 +118,6 @@ export function Sidebar({
             icon={<IconTrash />}
           />
         </div>
-
-        {/* Notebooks */}
-        {notebooks.length > 0 && (
-          <div className="sidebar-section">
-            <div className="sidebar-section-header">Notebooks</div>
-            {notebooks.map(nb => (
-              <SidebarItem
-                key={nb}
-                label={nb}
-                active={view === 'notes' && isFilterActive(filter, { type: 'notebook', name: nb })}
-                onClick={() => handleFilterClick({ type: 'notebook', name: nb })}
-                icon={<IconNotebook />}
-              />
-            ))}
-          </div>
-        )}
 
         {/* Tags */}
         {tags.length > 0 && (
@@ -221,17 +224,6 @@ function IconTrash() {
   );
 }
 
-function IconNotebook() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="2" width="9" height="12" rx="1" />
-      <line x1="4" y1="2" x2="4" y2="14" />
-      <line x1="3" y1="5" x2="5" y2="5" />
-      <line x1="3" y1="8" x2="5" y2="8" />
-      <line x1="3" y1="11" x2="5" y2="11" />
-    </svg>
-  );
-}
 
 function IconObserve() {
   return (

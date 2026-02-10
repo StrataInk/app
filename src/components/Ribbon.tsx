@@ -18,39 +18,27 @@ export interface RibbonCommand {
 
 interface RibbonProps {
   activeTab: RibbonTab;
-  onTabChange: (tab: RibbonTab) => void;
   onCommand: (cmd: RibbonCommand) => void;
   editorMode: EditorMode;
   onModeChange: (mode: EditorMode) => void;
   drawingActive: boolean;
   onDrawingToggle: () => void;
+  collapsed: boolean;
 }
-
-const TABS: RibbonTab[] = ['home', 'insert', 'draw', 'view'];
 
 export function Ribbon({
   activeTab,
-  onTabChange,
   onCommand,
   editorMode,
   onModeChange,
   drawingActive,
   onDrawingToggle,
+  collapsed,
 }: RibbonProps) {
+  if (collapsed) return null;
+
   return (
     <div className="ribbon">
-      <div className="ribbon-tabs">
-        {TABS.map(t => (
-          <button
-            key={t}
-            className={`ribbon-tab ${activeTab === t ? 'active' : ''}`}
-            onClick={() => onTabChange(t)}
-          >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
-
       <div className="ribbon-body">
         {activeTab === 'home' && (
           <HomeTab onCommand={onCommand} />

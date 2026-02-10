@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Settings, Palette, Type, FolderOpen, Info,
   Monitor, Moon, Sun, ChevronRight,
+  Cloud, Puzzle, PaintBucket,
 } from 'lucide-react';
 
 type SettingsTab = 'general' | 'editor' | 'appearance' | 'storage' | 'about';
@@ -111,6 +112,15 @@ export function SettingsView() {
                 </select>
               </SettingRow>
             </div>
+
+            <div className="settings-section">
+              <h3 className="settings-section-title">Sync</h3>
+              <div className="settings-empty-state">
+                <Cloud size={24} strokeWidth={1.5} className="settings-empty-state-icon" />
+                <span className="settings-empty-state-title">Sync is not yet available</span>
+                <span className="settings-empty-state-desc">Your notes are stored locally. Cloud sync will be supported in a future update.</span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -160,6 +170,15 @@ export function SettingsView() {
               <SettingToggle label="Word wrap" description="Wrap long lines instead of horizontal scrolling" checked={wordWrap} onChange={setWordWrap} />
               <SettingToggle label="Line numbers" description="Show line numbers in the editor gutter" checked={showLineNumbers} onChange={setShowLineNumbers} />
               <SettingToggle label="Spell check" description="Enable browser spell checking in the editor" checked={spellCheck} onChange={setSpellCheck} />
+            </div>
+
+            <div className="settings-section">
+              <h3 className="settings-section-title">Extensions</h3>
+              <div className="settings-empty-state">
+                <Puzzle size={24} strokeWidth={1.5} className="settings-empty-state-icon" />
+                <span className="settings-empty-state-title">Extensions coming soon</span>
+                <span className="settings-empty-state-desc">Editor extensions and plugins will be supported in a future update.</span>
+              </div>
             </div>
           </div>
         )}
@@ -225,6 +244,15 @@ export function SettingsView() {
                   <option value="100%">Full width</option>
                 </select>
               </SettingRow>
+            </div>
+
+            <div className="settings-section">
+              <h3 className="settings-section-title">Custom Themes</h3>
+              <div className="settings-empty-state">
+                <PaintBucket size={24} strokeWidth={1.5} className="settings-empty-state-icon" />
+                <span className="settings-empty-state-title">Custom themes coming soon</span>
+                <span className="settings-empty-state-desc">Create and import your own themes in a future release.</span>
+              </div>
             </div>
           </div>
         )}

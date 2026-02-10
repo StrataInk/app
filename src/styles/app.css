@@ -58,13 +58,43 @@
   transition: opacity 300ms ease;
 }
 
-.sidebar-brand {
-  padding: 16px 16px 12px;
-  font-size: 11px;
+.sidebar-notebook-switcher {
+  padding: 10px 10px 4px;
+  position: relative;
+}
+
+.notebook-dropdown {
+  width: 100%;
+  padding: 6px 28px 6px 10px;
+  background-color: var(--bg-input);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 12px;
   font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--transition);
+}
+
+.notebook-dropdown:focus {
+  border-color: rgba(129, 161, 193, 0.25);
+  outline: none;
+}
+
+.notebook-dropdown option {
+  background-color: var(--bg-sidebar);
+  color: var(--text-primary);
+}
+
+.notebook-dropdown-icon {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text-muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  pointer-events: none;
 }
 
 .sidebar-search {
@@ -171,6 +201,56 @@
   color: var(--text-muted);
 }
 
+/* ── Section Tabs — OneNote horizontal sections ───── */
+
+.section-tabs {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 16px;
+  background-color: var(--bg-list);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  flex-shrink: 0;
+  gap: 0;
+}
+
+.section-tab {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+
+.section-tab:hover {
+  color: var(--text-secondary);
+}
+
+.section-tab.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.section-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: 1px 1px 0 0;
+}
+
 /* ── Note List (Column 2) — Inkdrop compact list ──── */
 
 .notelist {
@@ -213,7 +293,7 @@
 /* ── Note Card — Inkdrop style ─────────────────────── */
 
 .note-card {
-  padding: 10px 12px;
+  padding: 8px 12px 8px 14px;
   border-radius: var(--radius);
   cursor: pointer;
   transition: background-color var(--transition);
@@ -221,7 +301,15 @@
   flex-direction: column;
   gap: 4px;
   position: relative;
+  border-left: 2px solid transparent;
 }
+
+.note-card[data-structure="thought"] { border-left-color: var(--signal-thought); }
+.note-card[data-structure="idea"] { border-left-color: var(--signal-idea); }
+.note-card[data-structure="question"] { border-left-color: var(--signal-question); }
+.note-card[data-structure="decision"] { border-left-color: var(--signal-decision); }
+.note-card[data-structure="system"] { border-left-color: var(--signal-system); }
+.note-card[data-structure="insight"] { border-left-color: var(--signal-insight); }
 
 .note-card:hover {
   background-color: var(--bg-surface);
@@ -594,59 +682,135 @@
 }
 
 /* Chrome bar — compact strip under title */
-.editor-chrome {
-  margin-bottom: 24px;
-  padding-bottom: 14px;
+/* ── Editor Header — signal controls ─────────────── */
+
+.editor-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.editor-meta {
+.editor-header-row {
   display: flex;
-  gap: 10px;
-  margin-bottom: 6px;
-  font-size: 11px;
-  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.editor-meta:last-child {
-  margin-bottom: 0;
-}
-
-.editor-meta label {
+.editor-header-left {
   display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editor-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.editor-action-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+/* ── Signal Controls (structure + pressure pills) ─── */
+
+.signal-control {
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  color: var(--text-muted);
-  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+  border: 1px solid transparent;
 }
 
-.editor-meta select {
-  padding: 3px 6px;
+.signal-structure[data-structure="idea"],
+.signal-structure[data-structure="decision"],
+.signal-structure[data-structure="insight"] {
+  color: var(--accent-yellow);
+  background-color: var(--accent-yellow-muted);
+  border-color: rgba(226, 200, 122, 0.15);
+}
+
+.signal-structure[data-structure="thought"],
+.signal-structure[data-structure="question"],
+.signal-structure[data-structure="system"] {
+  color: var(--accent-pink);
+  background-color: var(--accent-pink-muted);
+  border-color: rgba(201, 135, 154, 0.15);
+}
+
+.signal-structure:hover {
+  filter: brightness(1.15);
+}
+
+.signal-pressure {
+  color: var(--text-secondary);
+  background-color: var(--bg-surface);
+}
+
+.signal-pressure-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.signal-pressure[data-pressure="low"] .signal-pressure-dot { background-color: var(--pressure-low); }
+.signal-pressure[data-pressure="medium"] .signal-pressure-dot { background-color: var(--pressure-medium); }
+.signal-pressure[data-pressure="high"] .signal-pressure-dot { background-color: var(--pressure-high); }
+
+.signal-pressure:hover {
+  background-color: var(--bg-surface-active);
+}
+
+/* ── Editor Header Tags Row ─────────────────────── */
+
+.editor-header-tags {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.editor-header-notebook {
+  flex-shrink: 0;
+}
+
+.editor-notebook-input {
+  padding: 3px 8px;
   background-color: var(--bg-input);
   border: 1px solid transparent;
   border-radius: var(--radius);
   color: var(--text-secondary);
   font-size: 11px;
+  width: 140px;
   outline: none;
 }
 
-.editor-meta select:focus {
-  border-color: rgba(129, 161, 193, 0.25);
-}
-
-.editor-meta input[type="text"] {
-  padding: 3px 6px;
-  background-color: var(--bg-input);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  color: var(--text-secondary);
-  font-size: 11px;
-  width: 100px;
-  outline: none;
-}
-
-.editor-meta input[type="text"]:focus {
+.editor-notebook-input:focus {
   border-color: rgba(129, 161, 193, 0.25);
 }
 
@@ -1241,4 +1405,121 @@
   border-radius: 3px;
   font-size: 10px;
   font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* ══════════════════════════════════════════════════════
+   Settings Empty State
+   ══════════════════════════════════════════════════════ */
+
+.settings-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  text-align: center;
+  gap: 8px;
+}
+
+.settings-empty-state-icon {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.settings-empty-state-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.settings-empty-state-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════
+   StrataInk Component Library
+   ══════════════════════════════════════════════════════ */
+
+/* ── Badge (pill) ────────────────────────────────────── */
+
+.si-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 16px;
+}
+
+.si-badge--yellow {
+  color: var(--accent-yellow);
+  background-color: var(--accent-yellow-muted);
+  border: 1px solid rgba(226, 200, 122, 0.15);
+}
+
+.si-badge--pink {
+  color: var(--accent-pink);
+  background-color: var(--accent-pink-muted);
+  border: 1px solid rgba(201, 135, 154, 0.15);
+}
+
+.si-badge--muted {
+  color: var(--text-muted);
+  background-color: var(--bg-surface);
+}
+
+/* ── Notification Dot ─────────────────────────────────── */
+
+.si-notif-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.si-notif-dot--yellow { background-color: var(--accent-yellow); }
+.si-notif-dot--pink { background-color: var(--accent-pink); }
+.si-notif-dot--green { background-color: var(--pressure-low); }
+
+/* ── Panel Header ────────────────────────────────────── */
+
+.si-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── List Row ─────────────────────────────────────────── */
+
+.si-list-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.si-list-row:hover {
+  background-color: var(--bg-surface);
+}
+
+.si-list-row.active {
+  background-color: var(--bg-surface-active);
 }

@@ -3,11 +3,13 @@ import { Sidebar, type View, type SidebarFilter } from './components/Sidebar';
 import { NoteList } from './components/NoteList';
 import { TitleBar } from './components/TitleBar';
 import { Ribbon, type RibbonTab, type RibbonCommand } from './components/Ribbon';
+import { SectionTabs } from './components/SectionTabs';
 import { EditorView } from './views/EditorView';
 import { ObserveView } from './views/ObserveView';
 import { SettingsView } from './views/SettingsView';
 import type { EntryMeta, Entry } from './types';
 import type { EditorMode } from './components/editor/MarkdownEditor';
+import { getSectionsForNotebook, parseNotebookPath, buildNotebookPath } from './utils/notebook-hierarchy';
 import { v4 as uuid } from 'uuid';
 
 export default function App() {
@@ -20,14 +22,28 @@ export default function App() {
   const [tags, setTags] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // ── Notebook / Section Hierarchy ──────────────────────────────────
+  const [selectedNotebook, setSelectedNotebook] = useState<string | null>(null);
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+
+  const sectionsForNotebook = useMemo(() => {
+    if (!selectedNotebook) return [];
+    return getSectionsForNotebook(notebooks, selectedNotebook);
+  }, [notebooks, selectedNotebook]);
+
+  const handleNotebookSelect = (nb: string | null) => {
+    setSelectedNotebook(nb);
+    setSelectedSection(null);
+  };
+
   // ── Ribbon State ─────────────────────────────────────────────────────
   const [ribbonTab, setRibbonTab] = useState<RibbonTab>('home');
+  const [ribbonCollapsed, setRibbonCollapsed] = useState(true);
   const [editorMode, setEditorMode] = useState<EditorMode>('write');
   const [drawingActive, setDrawingActive] = useState(false);
   const ribbonCommandRef = useRef<((cmd: RibbonCommand) => void) | null>(null);
 
   const handleRibbonCommand = (cmd: RibbonCommand) => {
-    // Forward to the active EditorView via ref callback
     ribbonCommandRef.current?.(cmd);
   };
 
@@ -70,29 +86,43 @@ export default function App() {
   }, [filter]);
 
   const filteredEntries = useMemo(() => {
+    let base: EntryMeta[];
+
     if (filter.type === 'search') {
-      return searchResults ?? [];
+      base = searchResults ?? [];
+    } else {
+      base = entries.filter(e => {
+        switch (filter.type) {
+          case 'all':
+            return !e.trashed && !e.archived;
+          case 'pinned':
+            return e.pinned && !e.trashed && !e.archived;
+          case 'archive':
+            return e.archived && !e.trashed;
+          case 'trash':
+            return e.trashed;
+          case 'notebook':
+            return e.notebook === filter.name && !e.trashed && !e.archived;
+          case 'tag':
+            return e.tags.includes(filter.name) && !e.trashed && !e.archived;
+          default:
+            return true;
+        }
+      });
     }
 
-    return entries.filter(e => {
-      switch (filter.type) {
-        case 'all':
-          return !e.trashed && !e.archived;
-        case 'pinned':
-          return e.pinned && !e.trashed && !e.archived;
-        case 'archive':
-          return e.archived && !e.trashed;
-        case 'trash':
-          return e.trashed;
-        case 'notebook':
-          return e.notebook === filter.name && !e.trashed && !e.archived;
-        case 'tag':
-          return e.tags.includes(filter.name) && !e.trashed && !e.archived;
-        default:
-          return true;
-      }
-    });
-  }, [entries, filter, searchResults]);
+    // Apply notebook/section hierarchy filter
+    if (selectedNotebook && (filter.type === 'all' || filter.type === 'pinned')) {
+      base = base.filter(e => {
+        const { notebook, section } = parseNotebookPath(e.notebook);
+        if (notebook !== selectedNotebook) return false;
+        if (selectedSection && section !== selectedSection) return false;
+        return true;
+      });
+    }
+
+    return base;
+  }, [entries, filter, searchResults, selectedNotebook, selectedSection]);
 
   // ── Entry Actions ──────────────────────────────────────────────────
 
@@ -105,7 +135,13 @@ export default function App() {
 
   const createEntry = useCallback(async () => {
     const now = new Date().toISOString();
-    const nb = filter.type === 'notebook' ? filter.name : '';
+    // Use selected notebook/section hierarchy for new entries
+    let nb = '';
+    if (filter.type === 'notebook') {
+      nb = filter.name;
+    } else if (selectedNotebook) {
+      nb = buildNotebookPath(selectedNotebook, selectedSection ?? '');
+    }
     const tg = filter.type === 'tag' ? [filter.name] : [];
     const entry: Entry = {
       id: uuid(),
@@ -126,7 +162,7 @@ export default function App() {
     setView('notes');
     await loadEntries();
     await loadMeta();
-  }, [filter, loadEntries, loadMeta]);
+  }, [filter, selectedNotebook, selectedSection, loadEntries, loadMeta]);
 
   const saveEntry = async (entry: Entry) => {
     await window.strata.writeEntry(entry);
@@ -204,9 +240,17 @@ export default function App() {
 
   // ── Render ─────────────────────────────────────────────────────────
 
+  const showSectionTabs = view === 'notes' && selectedNotebook && sectionsForNotebook.length > 0;
+
   return (
     <div className="app-shell">
-      <TitleBar />
+      <TitleBar
+        ribbonCollapsed={ribbonCollapsed}
+        onRibbonCollapse={setRibbonCollapsed}
+        onRibbonTabActivate={setRibbonTab}
+        activeRibbonTab={ribbonTab}
+        hasActiveEntry={!!activeEntry && view === 'notes'}
+      />
       <div className="app-body">
         <Sidebar
           filter={filter}
@@ -218,18 +262,28 @@ export default function App() {
           notebooks={notebooks}
           tags={tags}
           searchInputRef={searchInputRef}
+          selectedNotebook={selectedNotebook}
+          onNotebookSelect={handleNotebookSelect}
         />
 
         <div className="app-main">
+          {showSectionTabs && (
+            <SectionTabs
+              sections={sectionsForNotebook}
+              activeSection={selectedSection}
+              onSectionSelect={setSelectedSection}
+            />
+          )}
+
           {view === 'notes' && activeEntry && (
             <Ribbon
               activeTab={ribbonTab}
-              onTabChange={setRibbonTab}
               onCommand={handleRibbonCommand}
               editorMode={editorMode}
               onModeChange={setEditorMode}
               drawingActive={drawingActive}
               onDrawingToggle={() => setDrawingActive(prev => !prev)}
+              collapsed={ribbonCollapsed}
             />
           )}
 

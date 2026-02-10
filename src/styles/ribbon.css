@@ -1,6 +1,13 @@
 /* ══════════════════════════════════════════════════════
-   TitleBar — Custom frameless window chrome
+   App Chrome — merged titlebar + command bar
    ══════════════════════════════════════════════════════ */
+
+.app-chrome {
+  flex-shrink: 0;
+  background-color: var(--bg-sidebar);
+}
+
+/* ── TitleBar ─────────────────────────────────────── */
 
 .titlebar {
   display: flex;
@@ -55,6 +62,81 @@
 .titlebar-btn--close:hover {
   background-color: #c42b1c;
   color: #fff;
+}
+
+/* ── Command Bar — ribbon tab triggers ────────────── */
+
+.command-bar {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  background-color: var(--bg-list);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+  -webkit-app-region: no-drag;
+}
+
+.command-bar-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.command-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.command-bar-btn:hover {
+  color: var(--text-secondary);
+  background-color: var(--bg-surface);
+}
+
+.command-bar-btn.active {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-active);
+}
+
+.command-bar-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.command-bar-spacer {
+  flex: 1;
+}
+
+.command-bar-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.command-bar-collapse:hover {
+  background-color: var(--bg-surface);
+}
+
+.command-bar-collapse .rotated {
+  transform: rotate(-90deg);
+  transition: transform 200ms ease;
 }
 
 /* ══════════════════════════════════════════════════════

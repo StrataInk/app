@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback, type KeyboardEvent } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, type KeyboardEvent } from 'react';
 import { Pin, PinOff, Trash2, RotateCcw, X, Book } from 'lucide-react';
 import { EditorView as CMEditorView } from '@codemirror/view';
-import type { Entry, Structure, Pressure } from '../types';
+import type { Entry, EntryMeta, Structure, Pressure } from '../types';
 import { MarkdownEditor, type EditorMode } from '../components/editor/MarkdownEditor';
 import type { RibbonCommand } from '../components/Ribbon';
 import { DrawCanvas, type DrawTool } from '../components/DrawCanvas';
@@ -19,6 +19,8 @@ interface EditorViewProps {
   onRibbonCommandRef: (fn: (cmd: RibbonCommand) => void) => void;
   drawingActive: boolean;
   sectionBreadcrumb?: { notebook: string; section: string | null };
+  allEntries?: EntryMeta[];
+  onWikiNavigate?: (id: string) => void;
 }
 
 const STRUCTURES: Structure[] = ['thought', 'idea', 'question', 'decision', 'system', 'insight'];
@@ -37,6 +39,8 @@ export function EditorView({
   onRibbonCommandRef,
   drawingActive,
   sectionBreadcrumb,
+  allEntries,
+  onWikiNavigate,
 }: EditorViewProps) {
   const [title, setTitle] = useState(entry.title);
   const [body, setBody] = useState(entry.body);
@@ -48,6 +52,12 @@ export function EditorView({
   const [drawTool, setDrawTool] = useState<DrawTool>('pen');
   const [drawColor, setDrawColor] = useState('#d8dee9');
   const [drawSize, setDrawSize] = useState(2);
+  const pageTitles = useMemo(() =>
+    (allEntries ?? [])
+      .filter(e => !e.trashed)
+      .map(e => ({ title: e.title, id: e.id })),
+    [allEntries]
+  );
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const cmViewRef = useRef<CMEditorView | null>(null);
@@ -281,7 +291,7 @@ export function EditorView({
         placeholder="Untitled"
         value={title}
         onChange={e => handleTitle(e.target.value)}
-        autoFocus
+        autoFocus={!entry.title}
       />
 
       <div className="editor-header">
@@ -373,6 +383,8 @@ export function EditorView({
           entryId={entry.id}
           mode={editorMode}
           onEditorViewRef={(v) => { cmViewRef.current = v; }}
+          pageTitles={pageTitles}
+          onWikiNavigate={onWikiNavigate}
         />
         {drawingActive && (
           <DrawCanvas tool={drawTool} color={drawColor} size={drawSize} />

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, Pin, PinOff, Trash2 } from 'lucide-react';
 import type { EntryMeta } from '../types';
 import type { SidebarFilter } from './Sidebar';
@@ -12,6 +12,7 @@ interface NoteListProps {
   onUnpin: (id: string) => void;
   onTrash: (id: string) => void;
   filter: SidebarFilter;
+  onReorder?: (updates: { id: string; sortOrder: number }[]) => void;
 }
 
 function filterLabel(filter: SidebarFilter): string {
@@ -38,21 +39,35 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin, onTrash, filter }: NoteListProps) {
+export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin, onTrash, filter, onReorder }: NoteListProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
 
+  // Scroll active card into view (for keyboard navigation)
   useEffect(() => {
-    bodyRef.current?.scrollTo({ top: 0 });
-  }, [entries]);
+    if (!activeId || !bodyRef.current) return;
+    const card = bodyRef.current.querySelector(`[data-entry-id="${activeId}"]`);
+    if (card) {
+      card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [activeId]);
 
-  const sorted = useMemo(() => {
-    return [...entries].sort((a, b) => {
-      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-      return new Date(b.modified).getTime() - new Date(a.modified).getTime();
-    });
-  }, [entries]);
-
+  const canDrag = filter.type !== 'trash' && !!onReorder;
   const showActions = filter.type !== 'trash';
+
+  const handleDrop = (targetId: string) => {
+    if (!dragId || dragId === targetId || !onReorder) return;
+    const ids = entries.map(e => e.id);
+    const fromIdx = ids.indexOf(dragId);
+    const toIdx = ids.indexOf(targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const reordered = [...ids];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, dragId);
+    const updates = reordered.map((id, i) => ({ id, sortOrder: (i + 1) * 100 }));
+    onReorder(updates);
+  };
 
   return (
     <div className="notelist">
@@ -70,7 +85,7 @@ export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin
         </div>
       </div>
       <div className="notelist-body" ref={bodyRef}>
-        {sorted.length === 0 ? (
+        {entries.length === 0 ? (
           <div className="empty" style={{ minHeight: 200 }}>
             <p>
               {filter.type === 'trash'
@@ -81,12 +96,32 @@ export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin
             </p>
           </div>
         ) : (
-          sorted.map(entry => (
+          entries.map(entry => (
             <div
               key={entry.id}
-              className={`note-card${activeId === entry.id ? ' selected' : ''}`}
+              data-entry-id={entry.id}
+              className={`note-card${activeId === entry.id ? ' selected' : ''}${dragId === entry.id ? ' dragging' : ''}${dropTargetId === entry.id ? ' drop-target' : ''}`}
               data-structure={entry.structure}
               onClick={() => onSelect(entry.id)}
+              draggable={canDrag}
+              onDragStart={(e) => {
+                setDragId(entry.id);
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', entry.id);
+              }}
+              onDragEnd={() => { setDragId(null); setDropTargetId(null); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (entry.id !== dragId) setDropTargetId(entry.id);
+              }}
+              onDragLeave={() => setDropTargetId(null)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDropTargetId(null);
+                handleDrop(entry.id);
+                setDragId(null);
+              }}
             >
               <div className="note-card-top">
                 <span className="note-card-title">

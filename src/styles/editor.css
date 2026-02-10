@@ -349,3 +349,13 @@
   border-radius: var(--radius);
   margin: 8px 0;
 }
+
+/* ── Wiki Links in CodeMirror ──────────────────── */
+
+.cm-wiki-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}

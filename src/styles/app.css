@@ -492,6 +492,137 @@
   background-color: rgba(191, 97, 106, 0.08);
 }
 
+/* ── Drag & Drop States ────────────────────────────── */
+
+.note-card.dragging {
+  opacity: 0.4;
+}
+
+.note-card.drop-target {
+  border-top: 2px solid var(--accent);
+}
+
+/* ── Section Tab Inline Input ────────────────────── */
+
+.section-tab-input {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.section-tab-input input {
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--text-heading);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  outline: none;
+  width: 120px;
+}
+
+.section-tab-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.section-tab-add:hover {
+  color: var(--text-secondary);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* ── Command Palette ─────────────────────────────── */
+
+.command-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20vh;
+}
+
+.command-palette {
+  width: 480px;
+  max-height: 400px;
+  background-color: var(--bg-list);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.command-palette-input {
+  padding: 14px 18px;
+  font-size: 15px;
+  font-family: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-heading);
+  outline: none;
+}
+
+.command-palette-input::placeholder {
+  color: var(--text-muted);
+}
+
+.command-palette-list {
+  overflow-y: auto;
+  max-height: 320px;
+  padding: 4px;
+}
+
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 80ms ease;
+}
+
+.command-palette-item.selected {
+  background-color: var(--bg-surface-active);
+}
+
+.command-palette-item-label {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.command-palette-item.selected .command-palette-item-label {
+  color: var(--text-heading);
+}
+
+.command-palette-item-category {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.command-palette-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 /* ── Focus Dimming ────────────────────────────────── */
 
 #root[data-editing="true"] .sidebar {

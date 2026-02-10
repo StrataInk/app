@@ -129,6 +129,7 @@ function listEntries(): EntryMeta[] {
         tags: Array.isArray(data.tags) ? data.tags : [],
         created: data.created ?? new Date().toISOString(),
         modified: data.modified ?? new Date().toISOString(),
+        sortOrder: data.sortOrder ?? undefined,
       });
       // Keep search index up to date
       searchIndex.set(id, {
@@ -162,6 +163,7 @@ function readEntry(id: string): Entry | null {
     tags: Array.isArray(data.tags) ? data.tags : [],
     created: data.created ?? new Date().toISOString(),
     modified: data.modified ?? new Date().toISOString(),
+    sortOrder: data.sortOrder ?? undefined,
     body: content,
   };
 }
@@ -170,7 +172,7 @@ function writeEntry(entry: Entry): void {
   const dir = getEntriesDir();
   fs.mkdirSync(dir, { recursive: true });
 
-  const frontmatter = {
+  const frontmatter: Record<string, unknown> = {
     id: entry.id,
     title: entry.title,
     structure: entry.structure,
@@ -183,6 +185,9 @@ function writeEntry(entry: Entry): void {
     created: entry.created,
     modified: new Date().toISOString(),
   };
+  if (entry.sortOrder !== undefined) {
+    frontmatter.sortOrder = entry.sortOrder;
+  }
 
   const content = matter.stringify(entry.body, frontmatter);
   fs.writeFileSync(path.join(dir, `${entry.id}.md`), content);
@@ -240,6 +245,34 @@ function unpinEntry(id: string): void {
   if (!entry) return;
   entry.pinned = false;
   writeEntry(entry);
+}
+
+function renameSection(notebook: string, oldSection: string, newSection: string): number {
+  const oldPath = (!oldSection || oldSection === 'General') ? notebook : `${notebook}/${oldSection}`;
+  const newPath = (!newSection || newSection === 'General') ? notebook : `${notebook}/${newSection}`;
+  const allEntries = listEntries();
+  let count = 0;
+  for (const meta of allEntries) {
+    if (meta.notebook === oldPath) {
+      const entry = readEntry(meta.id);
+      if (entry) {
+        entry.notebook = newPath;
+        writeEntry(entry);
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+function reorderEntries(updates: { id: string; sortOrder: number }[]): void {
+  for (const { id, sortOrder } of updates) {
+    const entry = readEntry(id);
+    if (entry) {
+      entry.sortOrder = sortOrder;
+      writeEntry(entry);
+    }
+  }
 }
 
 function searchEntries(query: string): EntryMeta[] {
@@ -344,6 +377,12 @@ function registerIPC(): void {
   ipcMain.handle('list-notebooks', () => listNotebooks());
   ipcMain.handle('list-tags', () => listTags());
 
+  ipcMain.handle('rename-section', (_e, notebook: string, oldSection: string, newSection: string) =>
+    renameSection(notebook, oldSection, newSection)
+  );
+  ipcMain.handle('reorder-entries', (_e, updates: { id: string; sortOrder: number }[]) =>
+    reorderEntries(updates)
+  );
   ipcMain.handle('get-connections', () => readConnections().connections);
   ipcMain.handle('add-connection', (_e, conn: Connection) => addConnection(conn));
   ipcMain.handle('remove-connection', (_e, from: string, to: string) => removeConnection(from, to));

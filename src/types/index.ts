@@ -20,6 +20,7 @@ export interface EntryMeta {
   tags: string[];
   created: string;     // ISO 8601
   modified: string;    // ISO 8601
+  sortOrder?: number;
 }
 
 export interface Entry extends EntryMeta {
@@ -59,6 +60,8 @@ export interface StrataAPI {
   getConnections: () => Promise<Connection[]>;
   addConnection: (conn: Connection) => Promise<void>;
   removeConnection: (from: string, to: string) => Promise<void>;
+  renameSection: (notebook: string, oldSection: string, newSection: string) => Promise<number>;
+  reorderEntries: (updates: { id: string; sortOrder: number }[]) => Promise<void>;
   windowMinimize: () => Promise<void>;
   windowMaximize: () => Promise<void>;
   windowClose: () => Promise<void>;

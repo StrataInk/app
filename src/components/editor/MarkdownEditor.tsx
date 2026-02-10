@@ -9,8 +9,12 @@ import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { markdownToHtml } from './markdown-utils';
 import { nordTheme, nordHighlightStyle } from './codemirror-theme';
+import { wikiLinksExtension } from './wiki-links';
 
 export type EditorMode = 'write' | 'split' | 'preview';
+
+// Module-level cursor position map — persists across re-renders
+const savedCursors = new Map<string, number>();
 
 interface MarkdownEditorProps {
   markdown: string;
@@ -19,6 +23,8 @@ interface MarkdownEditorProps {
   mode?: EditorMode;
   readOnly?: boolean;
   onEditorViewRef?: (view: EditorView | null) => void;
+  pageTitles?: { title: string; id: string }[];
+  onWikiNavigate?: (id: string) => void;
 }
 
 export function MarkdownEditor({
@@ -28,6 +34,8 @@ export function MarkdownEditor({
   mode = 'write',
   readOnly = false,
   onEditorViewRef,
+  pageTitles,
+  onWikiNavigate,
 }: MarkdownEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -35,6 +43,10 @@ export function MarkdownEditor({
   const prevEntryId = useRef(entryId);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const pageTitlesRef = useRef(pageTitles ?? []);
+  pageTitlesRef.current = pageTitles ?? [];
+  const onWikiNavigateRef = useRef(onWikiNavigate);
+  onWikiNavigateRef.current = onWikiNavigate;
 
   const [previewHtml, setPreviewHtml] = useState('');
 
@@ -84,6 +96,10 @@ export function MarkdownEditor({
         updateListener,
         readOnlyComp.current.of(EditorState.readOnly.of(readOnly)),
         EditorView.lineWrapping,
+        ...wikiLinksExtension(
+          () => pageTitlesRef.current,
+          (id) => onWikiNavigateRef.current?.(id)
+        ),
       ],
     });
 
@@ -106,10 +122,14 @@ export function MarkdownEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Mount once
 
-  // Handle entry switch: replace content
+  // Handle entry switch: save cursor, replace content, restore cursor
   useEffect(() => {
     if (prevEntryId.current !== entryId && viewRef.current) {
       const view = viewRef.current;
+
+      // Save outgoing cursor position
+      savedCursors.set(prevEntryId.current, view.state.selection.main.head);
+
       view.dispatch({
         changes: {
           from: 0,
@@ -119,6 +139,15 @@ export function MarkdownEditor({
       });
       prevEntryId.current = entryId;
       updatePreview(initialMarkdown);
+
+      // Restore incoming cursor position
+      const saved = savedCursors.get(entryId);
+      if (saved !== undefined) {
+        const clamped = Math.min(saved, initialMarkdown.length);
+        requestAnimationFrame(() => {
+          view.dispatch({ selection: { anchor: clamped } });
+        });
+      }
     }
   }, [entryId, initialMarkdown, updatePreview]);
 

@@ -5,6 +5,7 @@ import { TitleBar } from './components/TitleBar';
 import { Ribbon, type RibbonTab, type RibbonCommand } from './components/Ribbon';
 import { SectionTabs } from './components/SectionTabs';
 import { EditorView } from './views/EditorView';
+import { CommandPalette } from './components/CommandPalette';
 import { ObserveView } from './views/ObserveView';
 import { SettingsView } from './views/SettingsView';
 import type { EntryMeta, Entry } from './types';
@@ -21,6 +22,7 @@ export default function App() {
   const [notebooks, setNotebooks] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   // ── Notebook / Section Hierarchy ──────────────────────────────────
   const [selectedNotebook, setSelectedNotebook] = useState<string | null>(null);
@@ -129,6 +131,18 @@ export default function App() {
     return base;
   }, [entries, filter, searchResults, selectedNotebook, selectedSection]);
 
+  const sortedEntries = useMemo(() => {
+    return [...filteredEntries].sort((a, b) => {
+      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+      const aOrder = a.sortOrder ?? Infinity;
+      const bOrder = b.sortOrder ?? Infinity;
+      if (aOrder !== Infinity || bOrder !== Infinity) {
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
+      return new Date(b.modified).getTime() - new Date(a.modified).getTime();
+    });
+  }, [filteredEntries]);
+
   // ── Entry Actions ──────────────────────────────────────────────────
 
   const openEntry = async (id: string) => {
@@ -211,6 +225,70 @@ export default function App() {
     await loadEntries();
   };
 
+  // ── Section Create / Rename ────────────────────────────────────────
+
+  const handleCreateSection = useCallback(async (sectionName: string) => {
+    if (!selectedNotebook || !sectionName.trim()) return;
+    const nb = buildNotebookPath(selectedNotebook, sectionName.trim());
+    const now = new Date().toISOString();
+    const entry: Entry = {
+      id: uuid(),
+      title: '',
+      structure: 'thought',
+      pressure: 'low',
+      pinned: false,
+      archived: false,
+      trashed: false,
+      notebook: nb,
+      tags: [],
+      created: now,
+      modified: now,
+      body: '',
+    };
+    await window.strata.writeEntry(entry);
+    await loadEntries();
+    await loadMeta();
+    setSelectedSection(sectionName.trim());
+  }, [selectedNotebook, loadEntries, loadMeta]);
+
+  const handleRenameSection = useCallback(async (oldName: string, newName: string) => {
+    if (!selectedNotebook || !newName.trim() || oldName === newName) return;
+    await window.strata.renameSection(selectedNotebook, oldName, newName.trim());
+    await loadEntries();
+    await loadMeta();
+    if (selectedSection === oldName) {
+      setSelectedSection(newName.trim());
+    }
+  }, [selectedNotebook, selectedSection, loadEntries, loadMeta]);
+
+  // ── Page Reorder ──────────────────────────────────────────────────
+
+  const handleReorder = useCallback(async (updates: { id: string; sortOrder: number }[]) => {
+    await window.strata.reorderEntries(updates);
+    await loadEntries();
+  }, [loadEntries]);
+
+  // ── Keyboard Navigation ──────────────────────────────────────────
+
+  const navigateEntryList = useCallback((delta: number) => {
+    if (sortedEntries.length === 0) return;
+    const currentIndex = activeEntry
+      ? sortedEntries.findIndex(e => e.id === activeEntry.id)
+      : -1;
+    let nextIndex: number;
+    if (currentIndex === -1) {
+      nextIndex = delta > 0 ? 0 : sortedEntries.length - 1;
+    } else {
+      nextIndex = currentIndex + delta;
+      if (nextIndex < 0) nextIndex = 0;
+      if (nextIndex >= sortedEntries.length) nextIndex = sortedEntries.length - 1;
+    }
+    const target = sortedEntries[nextIndex];
+    if (target && target.id !== activeEntry?.id) {
+      openEntry(target.id);
+    }
+  }, [sortedEntries, activeEntry, openEntry]);
+
   // ── Keyboard Shortcuts ─────────────────────────────────────────────
 
   useEffect(() => {
@@ -223,12 +301,24 @@ export default function App() {
       } else if (mod && e.key === 'f') {
         e.preventDefault();
         searchInputRef.current?.focus();
+      } else if (mod && e.key === 'k') {
+        e.preventDefault();
+        setShowCommandPalette(prev => !prev);
+      } else if (e.altKey && e.key === 'ArrowUp') {
+        e.preventDefault();
+        navigateEntryList(-1);
+      } else if (e.altKey && e.key === 'ArrowDown') {
+        e.preventDefault();
+        navigateEntryList(1);
+      } else if (mod && e.key === 'Tab') {
+        e.preventDefault();
+        navigateEntryList(e.shiftKey ? -1 : 1);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [createEntry]);
+  }, [createEntry, navigateEntryList]);
 
   // ── Sync editing state to root for CSS ────────────────────────────
 
@@ -277,6 +367,8 @@ export default function App() {
               sections={sectionsForNotebook}
               activeSection={selectedSection}
               onSectionSelect={setSelectedSection}
+              onCreateSection={handleCreateSection}
+              onRenameSection={handleRenameSection}
             />
           )}
 
@@ -295,7 +387,7 @@ export default function App() {
           {view === 'notes' ? (
             <div className="app-content">
               <NoteList
-                entries={filteredEntries}
+                entries={sortedEntries}
                 activeId={activeEntry?.id ?? null}
                 onSelect={openEntry}
                 onCreate={createEntry}
@@ -303,6 +395,7 @@ export default function App() {
                 onUnpin={unpinEntry}
                 onTrash={trashEntry}
                 filter={filter}
+                onReorder={handleReorder}
               />
               <div className="editor-pane">
                 <div className="editor-pane-content">
@@ -320,6 +413,8 @@ export default function App() {
                       onRibbonCommandRef={(fn) => { ribbonCommandRef.current = fn; }}
                       drawingActive={drawingActive}
                       sectionBreadcrumb={selectedNotebook ? { notebook: selectedNotebook, section: selectedSection } : undefined}
+                      allEntries={entries}
+                      onWikiNavigate={(id) => openEntry(id)}
                     />
                   ) : (
                     <div className="empty">
@@ -342,6 +437,14 @@ export default function App() {
           )}
         </div>
       </div>
+      {showCommandPalette && (
+        <CommandPalette
+          entries={entries}
+          onClose={() => setShowCommandPalette(false)}
+          onNewPage={() => { setShowCommandPalette(false); createEntry(); }}
+          onJumpToPage={(id) => { setShowCommandPalette(false); openEntry(id); }}
+        />
+      )}
     </div>
   );
 }

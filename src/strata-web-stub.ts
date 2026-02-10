@@ -125,6 +125,26 @@ const stubAPI: StrataAPI = {
     return [...tagSet].sort();
   },
 
+  renameSection: async (notebook, oldSection, newSection) => {
+    const oldPath = (!oldSection || oldSection === 'General') ? notebook : `${notebook}/${oldSection}`;
+    const newPath = (!newSection || newSection === 'General') ? notebook : `${notebook}/${newSection}`;
+    let count = 0;
+    for (const e of entries) {
+      if (e.notebook === oldPath) {
+        e.notebook = newPath;
+        count++;
+      }
+    }
+    return count;
+  },
+
+  reorderEntries: async (updates) => {
+    for (const { id, sortOrder } of updates) {
+      const e = entries.find(x => x.id === id);
+      if (e) e.sortOrder = sortOrder;
+    }
+  },
+
   getConnections: async () => [],
   addConnection: async () => {},
   removeConnection: async () => {},

@@ -1,6 +1,6 @@
 export interface Preferences {
   // Appearance
-  theme: 'nord-dark' | 'editorial-light' | 'editorial-dark';
+  theme: string;
   sidebarWidth: string;
   notelistWidth: string;
   editorMaxWidth: string;

@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef, useCallback, useMemo, type KeyboardEvent } from 'react';
 import { Pin, PinOff, Trash2, RotateCcw, X, Book } from 'lucide-react';
 import { EditorView as CMEditorView } from '@codemirror/view';
+import { undo, redo } from '@codemirror/commands';
 import type { Entry, EntryMeta, Structure, Pressure } from '../types';
 import { MarkdownEditor, type EditorMode } from '../components/editor/MarkdownEditor';
 import type { RibbonCommand } from '../components/Ribbon';
 import { DrawCanvas, type DrawTool } from '../components/DrawCanvas';
+import { usePreferences } from '../state/PreferencesContext';
+import { useAppStore } from '../state/store';
 
 interface EditorViewProps {
   entry: Entry;
@@ -52,6 +55,7 @@ export function EditorView({
   const [drawTool, setDrawTool] = useState<DrawTool>('pen');
   const [drawColor, setDrawColor] = useState('#d8dee9');
   const [drawSize, setDrawSize] = useState(2);
+  const { prefs, update } = usePreferences();
   const pageTitles = useMemo(() =>
     (allEntries ?? [])
       .filter(e => !e.trashed)
@@ -168,6 +172,15 @@ export function EditorView({
         case 'date':
           snippet = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
           break;
+        case 'wiki-link':
+          snippet = '[[]]';
+          break;
+        case 'callout':
+          snippet = '\n> [!note]\n> ';
+          break;
+        case 'footnote':
+          snippet = '[^1]';
+          break;
       }
       if (snippet && view) {
         const cursor = view.state.selection.main.head;
@@ -196,7 +209,29 @@ export function EditorView({
         case 'bullet-list': prefix = '- '; break;
         case 'ordered-list': prefix = '1. '; break;
         case 'task-list': prefix = '- [ ] '; break;
+        case 'blockquote': prefix = '> '; break;
         case 'paragraph': break;
+        case 'clear': {
+          // Strip common markdown formatting
+          const cleaned = selected
+            .replace(/\*\*(.+?)\*\*/g, '$1')
+            .replace(/__(.+?)__/g, '$1')
+            .replace(/_(.+?)_/g, '$1')
+            .replace(/~~(.+?)~~/g, '$1')
+            .replace(/==(.+?)==/g, '$1')
+            .replace(/^#{1,6}\s+/gm, '')
+            .replace(/^[-*+]\s+/gm, '')
+            .replace(/^\d+\.\s+/gm, '')
+            .replace(/^>\s?/gm, '');
+          if (cleaned !== selected) {
+            view.dispatch({
+              changes: { from, to, insert: cleaned },
+              selection: { anchor: from + cleaned.length },
+            });
+            view.focus();
+          }
+          return;
+        }
       }
       if (prefix || suffix) {
         const wrapped = prefix + (selected || 'text') + suffix;
@@ -234,8 +269,18 @@ export function EditorView({
       setDrawColor(cmd.payload!);
     } else if (cmd.type === 'draw-size') {
       setDrawSize(Number(cmd.payload));
+    } else if (cmd.type === 'undo') {
+      if (view) undo(view);
+    } else if (cmd.type === 'redo') {
+      if (view) redo(view);
+    } else if (cmd.type === 'zen-mode') {
+      const store = useAppStore.getState();
+      if (!store.sidebarCollapsed) store.toggleSidebar();
+    } else if (cmd.type === 'toggle-line-numbers') {
+      const current = prefs.showLineNumbers;
+      update({ showLineNumbers: !current });
     }
-  }, []);
+  }, [prefs.showLineNumbers, update]);
 
   useEffect(() => {
     onRibbonCommandRef(handleRibbonCommand);
@@ -270,6 +315,10 @@ export function EditorView({
           entryId={entry.id}
           mode="preview"
           readOnly
+          wordWrap={prefs.wordWrap}
+          showLineNumbers={prefs.showLineNumbers}
+          tabSize={Number(prefs.tabSize)}
+          spellCheck={prefs.spellCheck}
         />
       </div>
     );
@@ -385,6 +434,10 @@ export function EditorView({
           onEditorViewRef={(v) => { cmViewRef.current = v; }}
           pageTitles={pageTitles}
           onWikiNavigate={onWikiNavigate}
+          wordWrap={prefs.wordWrap}
+          showLineNumbers={prefs.showLineNumbers}
+          tabSize={Number(prefs.tabSize)}
+          spellCheck={prefs.spellCheck}
         />
         {drawingActive && (
           <DrawCanvas tool={drawTool} color={drawColor} size={drawSize} />

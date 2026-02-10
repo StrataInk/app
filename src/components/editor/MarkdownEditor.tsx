@@ -25,6 +25,10 @@ interface MarkdownEditorProps {
   onEditorViewRef?: (view: EditorView | null) => void;
   pageTitles?: { title: string; id: string }[];
   onWikiNavigate?: (id: string) => void;
+  wordWrap?: boolean;
+  showLineNumbers?: boolean;
+  tabSize?: number;
+  spellCheck?: boolean;
 }
 
 export function MarkdownEditor({
@@ -36,10 +40,18 @@ export function MarkdownEditor({
   onEditorViewRef,
   pageTitles,
   onWikiNavigate,
+  wordWrap = true,
+  showLineNumbers = false,
+  tabSize = 2,
+  spellCheck = true,
 }: MarkdownEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const readOnlyComp = useRef(new Compartment());
+  const lineNumbersComp = useRef(new Compartment());
+  const lineWrappingComp = useRef(new Compartment());
+  const tabSizeComp = useRef(new Compartment());
+  const spellCheckComp = useRef(new Compartment());
   const prevEntryId = useRef(entryId);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -75,7 +87,7 @@ export function MarkdownEditor({
         nordTheme,
         syntaxHighlighting(nordHighlightStyle),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-        lineNumbers(),
+        lineNumbersComp.current.of(showLineNumbers ? lineNumbers() : []),
         highlightActiveLine(),
         highlightActiveLineGutter(),
         drawSelection(),
@@ -95,7 +107,9 @@ export function MarkdownEditor({
         ]),
         updateListener,
         readOnlyComp.current.of(EditorState.readOnly.of(readOnly)),
-        EditorView.lineWrapping,
+        lineWrappingComp.current.of(wordWrap ? EditorView.lineWrapping : []),
+        tabSizeComp.current.of(EditorState.tabSize.of(tabSize)),
+        spellCheckComp.current.of(EditorView.contentAttributes.of({ spellcheck: String(spellCheck) })),
         ...wikiLinksExtension(
           () => pageTitlesRef.current,
           (id) => onWikiNavigateRef.current?.(id)
@@ -159,6 +173,44 @@ export function MarkdownEditor({
       });
     }
   }, [readOnly]);
+
+  // Handle lineNumbers changes
+  useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: lineNumbersComp.current.reconfigure(showLineNumbers ? lineNumbers() : []),
+      });
+    }
+  }, [showLineNumbers]);
+
+  // Handle wordWrap changes
+  useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: lineWrappingComp.current.reconfigure(wordWrap ? EditorView.lineWrapping : []),
+      });
+    }
+  }, [wordWrap]);
+
+  // Handle tabSize changes
+  useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: tabSizeComp.current.reconfigure(EditorState.tabSize.of(tabSize)),
+      });
+    }
+  }, [tabSize]);
+
+  // Handle spellCheck changes
+  useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: spellCheckComp.current.reconfigure(
+          EditorView.contentAttributes.of({ spellcheck: String(spellCheck) })
+        ),
+      });
+    }
+  }, [spellCheck]);
 
   // Update preview when mode changes
   useEffect(() => {

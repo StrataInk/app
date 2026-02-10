@@ -69,12 +69,20 @@ export function wikiLinksExtension(
         const query = afterBracket.toLowerCase();
 
         const pages = getPageTitles();
-        const options = pages
-          .filter(p => p.title && p.title.toLowerCase().includes(query))
-          .map(p => ({
-            label: p.title,
-            apply: p.title + ']]',
-          }));
+        const filtered = pages
+          .filter(p => p.title && p.title.toLowerCase().includes(query));
+
+        // Sort: starts-with matches first, then contains
+        filtered.sort((a, b) => {
+          const aStarts = a.title.toLowerCase().startsWith(query) ? 0 : 1;
+          const bStarts = b.title.toLowerCase().startsWith(query) ? 0 : 1;
+          return aStarts - bStarts || a.title.localeCompare(b.title);
+        });
+
+        const options = filtered.map(p => ({
+          label: p.title,
+          apply: p.title + ']]',
+        }));
 
         return {
           from,

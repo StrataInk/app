@@ -1,30 +1,13 @@
 import type { RefObject } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { getUniqueNotebooks } from '../utils/notebook-hierarchy';
+import { useAppStore, type View, type SidebarFilter } from '../state/store';
 
-export type View = 'notes' | 'observe' | 'settings';
-
-export type SidebarFilter =
-  | { type: 'all' }
-  | { type: 'pinned' }
-  | { type: 'archive' }
-  | { type: 'trash' }
-  | { type: 'notebook'; name: string }
-  | { type: 'tag'; name: string }
-  | { type: 'search'; query: string };
+export type { View, SidebarFilter };
 
 interface SidebarProps {
-  filter: SidebarFilter;
-  onFilterChange: (filter: SidebarFilter) => void;
-  view: View;
-  onViewChange: (view: View) => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  notebooks: string[];
-  tags: string[];
   searchInputRef: RefObject<HTMLInputElement | null>;
-  selectedNotebook: string | null;
-  onNotebookSelect: (nb: string | null) => void;
+  collapsed?: boolean;
 }
 
 function isFilterActive(current: SidebarFilter, check: SidebarFilter): boolean {
@@ -34,43 +17,44 @@ function isFilterActive(current: SidebarFilter, check: SidebarFilter): boolean {
   return true;
 }
 
-export function Sidebar({
-  filter,
-  onFilterChange,
-  view,
-  onViewChange,
-  searchQuery,
-  onSearchChange,
-  notebooks,
-  tags,
-  searchInputRef,
-  selectedNotebook,
-  onNotebookSelect,
-}: SidebarProps) {
+export function Sidebar({ searchInputRef, collapsed }: SidebarProps) {
+  const filter = useAppStore(s => s.filter);
+  const view = useAppStore(s => s.view);
+  const searchQuery = useAppStore(s => s.searchQuery);
+  const notebooks = useAppStore(s => s.notebooks);
+  const tags = useAppStore(s => s.tags);
+  const selectedNotebook = useAppStore(s => s.selectedNotebook);
+
+  const setFilter = useAppStore(s => s.setFilter);
+  const setView = useAppStore(s => s.setView);
+  const setSearchQuery = useAppStore(s => s.setSearchQuery);
+  const setSelectedNotebook = useAppStore(s => s.setSelectedNotebook);
+
   const uniqueNotebooks = getUniqueNotebooks(notebooks);
+
   const handleSearch = (value: string) => {
-    onSearchChange(value);
+    setSearchQuery(value);
     if (value.trim()) {
-      onFilterChange({ type: 'search', query: value.trim() });
-      onViewChange('notes');
+      setFilter({ type: 'search', query: value.trim() });
+      setView('notes');
     } else {
-      onFilterChange({ type: 'all' });
+      setFilter({ type: 'all' });
     }
   };
 
   const handleFilterClick = (f: SidebarFilter) => {
-    onFilterChange(f);
-    onSearchChange('');
-    onViewChange('notes');
+    setFilter(f);
+    setSearchQuery('');
+    setView('notes');
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}`}>
       <div className="sidebar-notebook-switcher">
         <select
           className="notebook-dropdown"
           value={selectedNotebook ?? '__all__'}
-          onChange={e => onNotebookSelect(e.target.value === '__all__' ? null : e.target.value)}
+          onChange={e => setSelectedNotebook(e.target.value === '__all__' ? null : e.target.value)}
         >
           <option value="__all__">All Notebooks</option>
           {uniqueNotebooks.map(nb => (
@@ -141,13 +125,13 @@ export function Sidebar({
         <SidebarItem
           label="Observe"
           active={view === 'observe'}
-          onClick={() => onViewChange('observe')}
+          onClick={() => setView('observe')}
           icon={<IconObserve />}
         />
         <SidebarItem
           label="Settings"
           active={view === 'settings'}
-          onClick={() => onViewChange('settings')}
+          onClick={() => setView('settings')}
           icon={<IconSettings />}
         />
       </div>

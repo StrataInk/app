@@ -3,9 +3,11 @@ import {
   Bold, Italic, Underline, Strikethrough, Highlighter,
   List, ListOrdered, CheckSquare,
   Heading1, Heading2, Heading3, Type,
-  Table, Image, Link, Paperclip, Code, Minus as HRIcon, Calendar,
+  Table, Image, Link, Link2, Paperclip, Code, Minus as HRIcon, Calendar,
   Pen, PenTool, Eraser,
   Eye, Columns2, Edit3, ZoomIn, ZoomOut, Maximize,
+  Undo2, Redo2, Quote, RemoveFormatting,
+  AlertCircle, Footprints, Hash, PanelLeftClose,
 } from 'lucide-react';
 import type { EditorMode } from './editor/MarkdownEditor';
 
@@ -78,6 +80,13 @@ function HomeTab({ onCommand }: { onCommand: (cmd: RibbonCommand) => void }) {
 
       <div className="ribbon-separator" />
 
+      <RibbonGroup label="History">
+        <RibbonBtnSmall icon={<Undo2 size={14} strokeWidth={1.5} />} label="Undo" onClick={() => onCommand({ type: 'undo' })} />
+        <RibbonBtnSmall icon={<Redo2 size={14} strokeWidth={1.5} />} label="Redo" onClick={() => onCommand({ type: 'redo' })} />
+      </RibbonGroup>
+
+      <div className="ribbon-separator" />
+
       <RibbonGroup label="Format">
         <RibbonBtnSmall icon={<Bold size={14} strokeWidth={2} />} label="Bold" onClick={() => onCommand({ type: 'format', payload: 'bold' })} />
         <RibbonBtnSmall icon={<Italic size={14} strokeWidth={2} />} label="Italic" onClick={() => onCommand({ type: 'format', payload: 'italic' })} />
@@ -92,6 +101,8 @@ function HomeTab({ onCommand }: { onCommand: (cmd: RibbonCommand) => void }) {
         <RibbonBtnSmall icon={<List size={14} strokeWidth={1.5} />} label="Bullets" onClick={() => onCommand({ type: 'format', payload: 'bullet-list' })} />
         <RibbonBtnSmall icon={<ListOrdered size={14} strokeWidth={1.5} />} label="Numbered" onClick={() => onCommand({ type: 'format', payload: 'ordered-list' })} />
         <RibbonBtnSmall icon={<CheckSquare size={14} strokeWidth={1.5} />} label="Task" onClick={() => onCommand({ type: 'format', payload: 'task-list' })} />
+        <RibbonBtnSmall icon={<Quote size={14} strokeWidth={1.5} />} label="Blockquote" onClick={() => onCommand({ type: 'format', payload: 'blockquote' })} />
+        <RibbonBtnSmall icon={<RemoveFormatting size={14} strokeWidth={1.5} />} label="Clear" onClick={() => onCommand({ type: 'format', payload: 'clear' })} />
       </RibbonGroup>
 
       <div className="ribbon-separator" />
@@ -126,9 +137,12 @@ function InsertTab({ onCommand }: { onCommand: (cmd: RibbonCommand) => void }) {
 
       <RibbonGroup label="Content">
         <RibbonBtnSmall icon={<Link size={14} strokeWidth={1.5} />} label="Link" onClick={() => onCommand({ type: 'insert', payload: 'link' })} />
+        <RibbonBtnSmall icon={<Link2 size={14} strokeWidth={1.5} />} label="Wiki Link" onClick={() => onCommand({ type: 'insert', payload: 'wiki-link' })} />
         <RibbonBtnSmall icon={<Code size={14} strokeWidth={1.5} />} label="Code" onClick={() => onCommand({ type: 'insert', payload: 'code-block' })} />
         <RibbonBtnSmall icon={<HRIcon size={14} strokeWidth={1.5} />} label="Divider" onClick={() => onCommand({ type: 'insert', payload: 'divider' })} />
         <RibbonBtnSmall icon={<Calendar size={14} strokeWidth={1.5} />} label="Date" onClick={() => onCommand({ type: 'insert', payload: 'date' })} />
+        <RibbonBtnSmall icon={<AlertCircle size={14} strokeWidth={1.5} />} label="Callout" onClick={() => onCommand({ type: 'insert', payload: 'callout' })} />
+        <RibbonBtnSmall icon={<Footprints size={14} strokeWidth={1.5} />} label="Footnote" onClick={() => onCommand({ type: 'insert', payload: 'footnote' })} />
       </RibbonGroup>
     </>
   );
@@ -251,6 +265,17 @@ function ViewTab({ editorMode, onModeChange, onCommand }: ViewTabProps) {
           label="Focus"
           onClick={() => onCommand({ type: 'focus-mode' })}
         />
+        <RibbonBtn
+          icon={<PanelLeftClose size={18} strokeWidth={1.5} />}
+          label="Zen"
+          onClick={() => onCommand({ type: 'zen-mode' })}
+        />
+      </RibbonGroup>
+
+      <div className="ribbon-separator" />
+
+      <RibbonGroup label="Editor">
+        <RibbonBtnSmall icon={<Hash size={14} strokeWidth={1.5} />} label="Line Numbers" onClick={() => onCommand({ type: 'toggle-line-numbers' })} />
       </RibbonGroup>
     </>
   );

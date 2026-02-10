@@ -82,6 +82,37 @@
   --editor-font-size: 16px;
   --editor-line-height: 1.75;
   --editor-max-width: 720px;
+
+  /* ── CodeMirror Token Colors ──────────────────── */
+  --cm-text: #d8dee9;
+  --cm-text-bright: #eceff4;
+  --cm-cursor: #d8dee9;
+  --cm-selection: rgba(129, 161, 193, 0.15);
+  --cm-selection-match: rgba(136, 192, 208, 0.1);
+  --cm-active-line: rgba(255, 255, 255, 0.02);
+  --cm-panel-bg: #3b4252;
+  --cm-gutter: rgba(76, 86, 106, 0.4);
+  --cm-gutter-active: #4c566a;
+  --cm-search-match: rgba(136, 192, 208, 0.2);
+  --cm-search-match-outline: rgba(136, 192, 208, 0.4);
+  --cm-search-match-selected: rgba(136, 192, 208, 0.35);
+  --cm-matching-bracket: rgba(136, 192, 208, 0.2);
+  --cm-nonmatching-bracket: rgba(191, 97, 106, 0.2);
+  --cm-keyword: #81a1c1;
+  --cm-heading: #88c0d0;
+  --cm-string: #a3be8c;
+  --cm-comment: #4c566a;
+  --cm-link: #88c0d0;
+  --cm-number: #ebcb8b;
+  --cm-function: #88c0d0;
+  --cm-type: #ebcb8b;
+  --cm-operator: #8fbcbb;
+  --cm-atom: #d08770;
+  --cm-invalid: #bf616a;
+  --cm-list: #d08770;
+  --cm-quote: #4c566a;
+  --cm-monospace: #8fbcbb;
+  --cm-font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
 }
 
 /* ── Editorial Light ──────────────────────────────── */
@@ -125,6 +156,36 @@
   --pressure-low: #65a30d;
   --pressure-medium: #ca8a04;
   --pressure-high: #dc2626;
+
+  --cm-text: #292524;
+  --cm-text-bright: #1c1917;
+  --cm-cursor: #292524;
+  --cm-selection: rgba(99, 102, 241, 0.12);
+  --cm-selection-match: rgba(99, 102, 241, 0.08);
+  --cm-active-line: rgba(0, 0, 0, 0.02);
+  --cm-panel-bg: #f0eeeb;
+  --cm-gutter: rgba(0, 0, 0, 0.2);
+  --cm-gutter-active: #57534e;
+  --cm-search-match: rgba(99, 102, 241, 0.15);
+  --cm-search-match-outline: rgba(99, 102, 241, 0.3);
+  --cm-search-match-selected: rgba(99, 102, 241, 0.25);
+  --cm-matching-bracket: rgba(99, 102, 241, 0.15);
+  --cm-nonmatching-bracket: rgba(220, 38, 38, 0.15);
+  --cm-keyword: #6366f1;
+  --cm-heading: #6366f1;
+  --cm-string: #65a30d;
+  --cm-comment: #a8a29e;
+  --cm-link: #6366f1;
+  --cm-number: #ca8a04;
+  --cm-function: #0d9488;
+  --cm-type: #ca8a04;
+  --cm-operator: #0d9488;
+  --cm-atom: #c2410c;
+  --cm-invalid: #dc2626;
+  --cm-list: #c2410c;
+  --cm-quote: #a8a29e;
+  --cm-monospace: #0d9488;
+  --cm-font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
 }
 
 /* ── Editorial Dark ───────────────────────────────── */
@@ -168,4 +229,622 @@
   --pressure-low: #86efac;
   --pressure-medium: #fbbf24;
   --pressure-high: #ef4444;
+
+  --cm-text: #e7e5e4;
+  --cm-text-bright: #fafaf9;
+  --cm-cursor: #e7e5e4;
+  --cm-selection: rgba(201, 135, 154, 0.15);
+  --cm-selection-match: rgba(201, 135, 154, 0.1);
+  --cm-active-line: rgba(255, 255, 255, 0.02);
+  --cm-panel-bg: #1c1917;
+  --cm-gutter: rgba(120, 113, 108, 0.4);
+  --cm-gutter-active: #78716c;
+  --cm-search-match: rgba(201, 135, 154, 0.2);
+  --cm-search-match-outline: rgba(201, 135, 154, 0.4);
+  --cm-search-match-selected: rgba(201, 135, 154, 0.35);
+  --cm-matching-bracket: rgba(201, 135, 154, 0.2);
+  --cm-nonmatching-bracket: rgba(239, 68, 68, 0.2);
+  --cm-keyword: #c9879a;
+  --cm-heading: #e2c87a;
+  --cm-string: #86efac;
+  --cm-comment: #78716c;
+  --cm-link: #c9879a;
+  --cm-number: #fbbf24;
+  --cm-function: #5eead4;
+  --cm-type: #fbbf24;
+  --cm-operator: #5eead4;
+  --cm-atom: #fb923c;
+  --cm-invalid: #ef4444;
+  --cm-list: #fb923c;
+  --cm-quote: #78716c;
+  --cm-monospace: #5eead4;
+  --cm-font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+}
+
+/* ═══════════════════════════════════════════════════
+   Popular App-Inspired Themes
+   ═══════════════════════════════════════════════════ */
+
+/* ── Obsidian Dark ─────────────────────────────── */
+
+[data-theme="obsidian-dark"] {
+  --bg-sidebar: #1a1a2e;
+  --bg-list: #1e1e32;
+  --bg-canvas: #262640;
+
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(124, 58, 237, 0.12);
+  --bg-input: rgba(0, 0, 0, 0.20);
+
+  --text-primary: #dcddde;
+  --text-secondary: #999;
+  --text-muted: #666;
+  --text-heading: #f0f0f0;
+
+  --accent: #7c3aed;
+  --accent-yellow: #e2c87a;
+  --accent-yellow-muted: rgba(226, 200, 122, 0.12);
+  --accent-pink: #c084fc;
+  --accent-pink-muted: rgba(192, 132, 252, 0.12);
+
+  --signal-thought: #7c3aed;
+  --signal-idea: #e2c87a;
+  --signal-question: #c084fc;
+  --signal-decision: #4ade80;
+  --signal-system: #22d3ee;
+  --signal-insight: #fb923c;
+
+  --btn-primary-bg: #7c3aed;
+  --btn-primary-text: #fff;
+  --btn-primary-hover: #6d28d9;
+  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #dcddde;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.10);
+
+  --border: rgba(255, 255, 255, 0.06);
+
+  --pressure-low: #4ade80;
+  --pressure-medium: #facc15;
+  --pressure-high: #ef4444;
+
+  --cm-text: #dcddde;
+  --cm-text-bright: #f0f0f0;
+  --cm-cursor: #7c3aed;
+  --cm-selection: rgba(124, 58, 237, 0.2);
+  --cm-selection-match: rgba(124, 58, 237, 0.1);
+  --cm-active-line: rgba(124, 58, 237, 0.04);
+  --cm-panel-bg: #1a1a2e;
+  --cm-gutter: rgba(102, 102, 102, 0.4);
+  --cm-gutter-active: #666;
+  --cm-search-match: rgba(124, 58, 237, 0.2);
+  --cm-search-match-outline: rgba(124, 58, 237, 0.4);
+  --cm-search-match-selected: rgba(124, 58, 237, 0.35);
+  --cm-matching-bracket: rgba(124, 58, 237, 0.25);
+  --cm-nonmatching-bracket: rgba(239, 68, 68, 0.2);
+  --cm-keyword: #c084fc;
+  --cm-heading: #7c3aed;
+  --cm-string: #4ade80;
+  --cm-comment: #666;
+  --cm-link: #7c3aed;
+  --cm-number: #e2c87a;
+  --cm-function: #22d3ee;
+  --cm-type: #e2c87a;
+  --cm-operator: #22d3ee;
+  --cm-atom: #fb923c;
+  --cm-invalid: #ef4444;
+  --cm-list: #fb923c;
+  --cm-quote: #666;
+  --cm-monospace: #22d3ee;
+  --cm-font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+}
+
+/* ── Notion Light ──────────────────────────────── */
+
+[data-theme="notion-light"] {
+  --bg-sidebar: #f7f6f3;
+  --bg-list: #fbfbfa;
+  --bg-canvas: #ffffff;
+
+  --bg-surface: rgba(0, 0, 0, 0.02);
+  --bg-surface-active: rgba(0, 0, 0, 0.05);
+  --bg-input: rgba(0, 0, 0, 0.03);
+
+  --text-primary: #37352f;
+  --text-secondary: #6b6b6b;
+  --text-muted: #b3b3b3;
+  --text-heading: #1a1a1a;
+
+  --accent: #37352f;
+  --accent-yellow: #cb912f;
+  --accent-yellow-muted: rgba(203, 145, 47, 0.10);
+  --accent-pink: #d44c47;
+  --accent-pink-muted: rgba(212, 76, 71, 0.10);
+
+  --signal-thought: #37352f;
+  --signal-idea: #cb912f;
+  --signal-question: #d44c47;
+  --signal-decision: #448361;
+  --signal-system: #337ea9;
+  --signal-insight: #cb912f;
+
+  --btn-primary-bg: #37352f;
+  --btn-primary-text: #fff;
+  --btn-primary-hover: #1a1a1a;
+  --btn-secondary-bg: rgba(0, 0, 0, 0.04);
+  --btn-secondary-text: #37352f;
+  --btn-secondary-hover: rgba(0, 0, 0, 0.08);
+
+  --border: rgba(0, 0, 0, 0.06);
+
+  --pressure-low: #448361;
+  --pressure-medium: #cb912f;
+  --pressure-high: #d44c47;
+
+  --cm-text: #37352f;
+  --cm-text-bright: #1a1a1a;
+  --cm-cursor: #37352f;
+  --cm-selection: rgba(55, 53, 47, 0.08);
+  --cm-selection-match: rgba(55, 53, 47, 0.05);
+  --cm-active-line: rgba(0, 0, 0, 0.015);
+  --cm-panel-bg: #f7f6f3;
+  --cm-gutter: rgba(0, 0, 0, 0.15);
+  --cm-gutter-active: #6b6b6b;
+  --cm-search-match: rgba(203, 145, 47, 0.2);
+  --cm-search-match-outline: rgba(203, 145, 47, 0.4);
+  --cm-search-match-selected: rgba(203, 145, 47, 0.3);
+  --cm-matching-bracket: rgba(55, 53, 47, 0.1);
+  --cm-nonmatching-bracket: rgba(212, 76, 71, 0.15);
+  --cm-keyword: #337ea9;
+  --cm-heading: #37352f;
+  --cm-string: #448361;
+  --cm-comment: #b3b3b3;
+  --cm-link: #337ea9;
+  --cm-number: #cb912f;
+  --cm-function: #337ea9;
+  --cm-type: #cb912f;
+  --cm-operator: #448361;
+  --cm-atom: #d44c47;
+  --cm-invalid: #d44c47;
+  --cm-list: #37352f;
+  --cm-quote: #b3b3b3;
+  --cm-monospace: #337ea9;
+  --cm-font-family: 'Georgia', serif;
+}
+
+/* ── Bear Light ────────────────────────────────── */
+
+[data-theme="bear-light"] {
+  --bg-sidebar: #f5f0eb;
+  --bg-list: #faf7f4;
+  --bg-canvas: #ffffff;
+
+  --bg-surface: rgba(0, 0, 0, 0.02);
+  --bg-surface-active: rgba(220, 38, 38, 0.06);
+  --bg-input: rgba(0, 0, 0, 0.03);
+
+  --text-primary: #30302f;
+  --text-secondary: #6e6e6d;
+  --text-muted: #aeaeae;
+  --text-heading: #1a1a1a;
+
+  --accent: #dc2626;
+  --accent-yellow: #d97706;
+  --accent-yellow-muted: rgba(217, 119, 6, 0.10);
+  --accent-pink: #dc2626;
+  --accent-pink-muted: rgba(220, 38, 38, 0.10);
+
+  --signal-thought: #dc2626;
+  --signal-idea: #d97706;
+  --signal-question: #db2777;
+  --signal-decision: #16a34a;
+  --signal-system: #0891b2;
+  --signal-insight: #ea580c;
+
+  --btn-primary-bg: #dc2626;
+  --btn-primary-text: #fff;
+  --btn-primary-hover: #b91c1c;
+  --btn-secondary-bg: rgba(0, 0, 0, 0.04);
+  --btn-secondary-text: #30302f;
+  --btn-secondary-hover: rgba(0, 0, 0, 0.08);
+
+  --border: rgba(0, 0, 0, 0.07);
+
+  --pressure-low: #16a34a;
+  --pressure-medium: #d97706;
+  --pressure-high: #dc2626;
+
+  --cm-text: #30302f;
+  --cm-text-bright: #1a1a1a;
+  --cm-cursor: #dc2626;
+  --cm-selection: rgba(220, 38, 38, 0.1);
+  --cm-selection-match: rgba(220, 38, 38, 0.06);
+  --cm-active-line: rgba(0, 0, 0, 0.015);
+  --cm-panel-bg: #f5f0eb;
+  --cm-gutter: rgba(0, 0, 0, 0.15);
+  --cm-gutter-active: #6e6e6d;
+  --cm-search-match: rgba(220, 38, 38, 0.15);
+  --cm-search-match-outline: rgba(220, 38, 38, 0.3);
+  --cm-search-match-selected: rgba(220, 38, 38, 0.25);
+  --cm-matching-bracket: rgba(220, 38, 38, 0.12);
+  --cm-nonmatching-bracket: rgba(220, 38, 38, 0.2);
+  --cm-keyword: #dc2626;
+  --cm-heading: #dc2626;
+  --cm-string: #16a34a;
+  --cm-comment: #aeaeae;
+  --cm-link: #dc2626;
+  --cm-number: #d97706;
+  --cm-function: #0891b2;
+  --cm-type: #d97706;
+  --cm-operator: #0891b2;
+  --cm-atom: #ea580c;
+  --cm-invalid: #dc2626;
+  --cm-list: #30302f;
+  --cm-quote: #aeaeae;
+  --cm-monospace: #0891b2;
+  --cm-font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+}
+
+/* ── iA Writer Light ───────────────────────────── */
+
+[data-theme="ia-writer-light"] {
+  --bg-sidebar: #f2f2f2;
+  --bg-list: #f8f8f8;
+  --bg-canvas: #fefefe;
+
+  --bg-surface: rgba(0, 0, 0, 0.02);
+  --bg-surface-active: rgba(37, 99, 235, 0.06);
+  --bg-input: rgba(0, 0, 0, 0.04);
+
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-muted: #aeaeb2;
+  --text-heading: #000000;
+
+  --accent: #2563eb;
+  --accent-yellow: #ca8a04;
+  --accent-yellow-muted: rgba(202, 138, 4, 0.10);
+  --accent-pink: #be185d;
+  --accent-pink-muted: rgba(190, 24, 93, 0.10);
+
+  --signal-thought: #2563eb;
+  --signal-idea: #ca8a04;
+  --signal-question: #be185d;
+  --signal-decision: #15803d;
+  --signal-system: #0e7490;
+  --signal-insight: #c2410c;
+
+  --btn-primary-bg: #2563eb;
+  --btn-primary-text: #fff;
+  --btn-primary-hover: #1d4ed8;
+  --btn-secondary-bg: rgba(0, 0, 0, 0.04);
+  --btn-secondary-text: #1d1d1f;
+  --btn-secondary-hover: rgba(0, 0, 0, 0.08);
+
+  --border: rgba(0, 0, 0, 0.08);
+
+  --pressure-low: #15803d;
+  --pressure-medium: #ca8a04;
+  --pressure-high: #dc2626;
+
+  --cm-text: #1d1d1f;
+  --cm-text-bright: #000000;
+  --cm-cursor: #2563eb;
+  --cm-selection: rgba(37, 99, 235, 0.1);
+  --cm-selection-match: rgba(37, 99, 235, 0.06);
+  --cm-active-line: rgba(37, 99, 235, 0.02);
+  --cm-panel-bg: #f2f2f2;
+  --cm-gutter: rgba(0, 0, 0, 0.15);
+  --cm-gutter-active: #6e6e73;
+  --cm-search-match: rgba(37, 99, 235, 0.15);
+  --cm-search-match-outline: rgba(37, 99, 235, 0.3);
+  --cm-search-match-selected: rgba(37, 99, 235, 0.25);
+  --cm-matching-bracket: rgba(37, 99, 235, 0.12);
+  --cm-nonmatching-bracket: rgba(220, 38, 38, 0.15);
+  --cm-keyword: #2563eb;
+  --cm-heading: #2563eb;
+  --cm-string: #15803d;
+  --cm-comment: #aeaeb2;
+  --cm-link: #2563eb;
+  --cm-number: #ca8a04;
+  --cm-function: #0e7490;
+  --cm-type: #ca8a04;
+  --cm-operator: #0e7490;
+  --cm-atom: #c2410c;
+  --cm-invalid: #dc2626;
+  --cm-list: #1d1d1f;
+  --cm-quote: #aeaeb2;
+  --cm-monospace: #0e7490;
+  --cm-font-family: 'iA Writer Mono', 'Consolas', monospace;
+}
+
+/* ── Typora Sepia ──────────────────────────────── */
+
+[data-theme="typora-sepia"] {
+  --bg-sidebar: #e8e0d0;
+  --bg-list: #f0e8d8;
+  --bg-canvas: #f8f2e6;
+
+  --bg-surface: rgba(0, 0, 0, 0.03);
+  --bg-surface-active: rgba(0, 0, 0, 0.06);
+  --bg-input: rgba(0, 0, 0, 0.04);
+
+  --text-primary: #3c3226;
+  --text-secondary: #6b5d4e;
+  --text-muted: #a09080;
+  --text-heading: #2a2016;
+
+  --accent: #8b5c2a;
+  --accent-yellow: #a07020;
+  --accent-yellow-muted: rgba(160, 112, 32, 0.10);
+  --accent-pink: #a05050;
+  --accent-pink-muted: rgba(160, 80, 80, 0.10);
+
+  --signal-thought: #8b5c2a;
+  --signal-idea: #a07020;
+  --signal-question: #a05050;
+  --signal-decision: #5a7a40;
+  --signal-system: #4a7a7a;
+  --signal-insight: #b06030;
+
+  --btn-primary-bg: #3c3226;
+  --btn-primary-text: #f8f2e6;
+  --btn-primary-hover: #2a2016;
+  --btn-secondary-bg: rgba(0, 0, 0, 0.05);
+  --btn-secondary-text: #3c3226;
+  --btn-secondary-hover: rgba(0, 0, 0, 0.09);
+
+  --border: rgba(0, 0, 0, 0.08);
+
+  --pressure-low: #5a7a40;
+  --pressure-medium: #a07020;
+  --pressure-high: #b04040;
+
+  --cm-text: #3c3226;
+  --cm-text-bright: #2a2016;
+  --cm-cursor: #8b5c2a;
+  --cm-selection: rgba(139, 92, 42, 0.12);
+  --cm-selection-match: rgba(139, 92, 42, 0.08);
+  --cm-active-line: rgba(0, 0, 0, 0.02);
+  --cm-panel-bg: #e8e0d0;
+  --cm-gutter: rgba(0, 0, 0, 0.15);
+  --cm-gutter-active: #6b5d4e;
+  --cm-search-match: rgba(139, 92, 42, 0.2);
+  --cm-search-match-outline: rgba(139, 92, 42, 0.3);
+  --cm-search-match-selected: rgba(139, 92, 42, 0.3);
+  --cm-matching-bracket: rgba(139, 92, 42, 0.15);
+  --cm-nonmatching-bracket: rgba(176, 64, 64, 0.15);
+  --cm-keyword: #8b5c2a;
+  --cm-heading: #8b5c2a;
+  --cm-string: #5a7a40;
+  --cm-comment: #a09080;
+  --cm-link: #8b5c2a;
+  --cm-number: #a07020;
+  --cm-function: #4a7a7a;
+  --cm-type: #a07020;
+  --cm-operator: #4a7a7a;
+  --cm-atom: #b06030;
+  --cm-invalid: #b04040;
+  --cm-list: #3c3226;
+  --cm-quote: #a09080;
+  --cm-monospace: #4a7a7a;
+  --cm-font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+/* ── Dracula Dark ──────────────────────────────── */
+
+[data-theme="dracula-dark"] {
+  --bg-sidebar: #21222c;
+  --bg-list: #282a36;
+  --bg-canvas: #2d2f3d;
+
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(189, 147, 249, 0.10);
+  --bg-input: rgba(0, 0, 0, 0.20);
+
+  --text-primary: #f8f8f2;
+  --text-secondary: #bfbfbf;
+  --text-muted: #6272a4;
+  --text-heading: #f8f8f2;
+
+  --accent: #bd93f9;
+  --accent-yellow: #f1fa8c;
+  --accent-yellow-muted: rgba(241, 250, 140, 0.12);
+  --accent-pink: #ff79c6;
+  --accent-pink-muted: rgba(255, 121, 198, 0.12);
+
+  --signal-thought: #bd93f9;
+  --signal-idea: #f1fa8c;
+  --signal-question: #ff79c6;
+  --signal-decision: #50fa7b;
+  --signal-system: #8be9fd;
+  --signal-insight: #ffb86c;
+
+  --btn-primary-bg: #bd93f9;
+  --btn-primary-text: #282a36;
+  --btn-primary-hover: #caa8fc;
+  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #f8f8f2;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.10);
+
+  --border: rgba(255, 255, 255, 0.06);
+
+  --pressure-low: #50fa7b;
+  --pressure-medium: #f1fa8c;
+  --pressure-high: #ff5555;
+
+  --cm-text: #f8f8f2;
+  --cm-text-bright: #ffffff;
+  --cm-cursor: #f8f8f2;
+  --cm-selection: rgba(189, 147, 249, 0.2);
+  --cm-selection-match: rgba(189, 147, 249, 0.1);
+  --cm-active-line: rgba(255, 255, 255, 0.02);
+  --cm-panel-bg: #21222c;
+  --cm-gutter: rgba(98, 114, 164, 0.5);
+  --cm-gutter-active: #6272a4;
+  --cm-search-match: rgba(241, 250, 140, 0.2);
+  --cm-search-match-outline: rgba(241, 250, 140, 0.4);
+  --cm-search-match-selected: rgba(241, 250, 140, 0.3);
+  --cm-matching-bracket: rgba(189, 147, 249, 0.25);
+  --cm-nonmatching-bracket: rgba(255, 85, 85, 0.25);
+  --cm-keyword: #ff79c6;
+  --cm-heading: #bd93f9;
+  --cm-string: #f1fa8c;
+  --cm-comment: #6272a4;
+  --cm-link: #8be9fd;
+  --cm-number: #bd93f9;
+  --cm-function: #50fa7b;
+  --cm-type: #8be9fd;
+  --cm-operator: #ff79c6;
+  --cm-atom: #ffb86c;
+  --cm-invalid: #ff5555;
+  --cm-list: #ffb86c;
+  --cm-quote: #6272a4;
+  --cm-monospace: #50fa7b;
+  --cm-font-family: 'Fira Code', 'Consolas', monospace;
+}
+
+/* ── Solarized Dark ────────────────────────────── */
+
+[data-theme="solarized-dark"] {
+  --bg-sidebar: #002029;
+  --bg-list: #002b36;
+  --bg-canvas: #073642;
+
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(38, 139, 210, 0.12);
+  --bg-input: rgba(0, 0, 0, 0.15);
+
+  --text-primary: #839496;
+  --text-secondary: #657b83;
+  --text-muted: #586e75;
+  --text-heading: #93a1a1;
+
+  --accent: #268bd2;
+  --accent-yellow: #b58900;
+  --accent-yellow-muted: rgba(181, 137, 0, 0.12);
+  --accent-pink: #d33682;
+  --accent-pink-muted: rgba(211, 54, 130, 0.12);
+
+  --signal-thought: #268bd2;
+  --signal-idea: #b58900;
+  --signal-question: #d33682;
+  --signal-decision: #859900;
+  --signal-system: #2aa198;
+  --signal-insight: #cb4b16;
+
+  --btn-primary-bg: #268bd2;
+  --btn-primary-text: #fdf6e3;
+  --btn-primary-hover: #2aa1d4;
+  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #839496;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.10);
+
+  --border: rgba(255, 255, 255, 0.06);
+
+  --pressure-low: #859900;
+  --pressure-medium: #b58900;
+  --pressure-high: #dc322f;
+
+  --cm-text: #839496;
+  --cm-text-bright: #93a1a1;
+  --cm-cursor: #839496;
+  --cm-selection: rgba(38, 139, 210, 0.18);
+  --cm-selection-match: rgba(38, 139, 210, 0.1);
+  --cm-active-line: rgba(255, 255, 255, 0.02);
+  --cm-panel-bg: #002b36;
+  --cm-gutter: rgba(88, 110, 117, 0.4);
+  --cm-gutter-active: #586e75;
+  --cm-search-match: rgba(181, 137, 0, 0.2);
+  --cm-search-match-outline: rgba(181, 137, 0, 0.4);
+  --cm-search-match-selected: rgba(181, 137, 0, 0.35);
+  --cm-matching-bracket: rgba(38, 139, 210, 0.2);
+  --cm-nonmatching-bracket: rgba(220, 50, 47, 0.2);
+  --cm-keyword: #859900;
+  --cm-heading: #cb4b16;
+  --cm-string: #2aa198;
+  --cm-comment: #586e75;
+  --cm-link: #268bd2;
+  --cm-number: #d33682;
+  --cm-function: #268bd2;
+  --cm-type: #b58900;
+  --cm-operator: #859900;
+  --cm-atom: #cb4b16;
+  --cm-invalid: #dc322f;
+  --cm-list: #cb4b16;
+  --cm-quote: #586e75;
+  --cm-monospace: #2aa198;
+  --cm-font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* ── Gruvbox Dark ──────────────────────────────── */
+
+[data-theme="gruvbox-dark"] {
+  --bg-sidebar: #1d2021;
+  --bg-list: #282828;
+  --bg-canvas: #32302f;
+
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(215, 153, 33, 0.12);
+  --bg-input: rgba(0, 0, 0, 0.20);
+
+  --text-primary: #ebdbb2;
+  --text-secondary: #a89984;
+  --text-muted: #665c54;
+  --text-heading: #fbf1c7;
+
+  --accent: #d79921;
+  --accent-yellow: #fabd2f;
+  --accent-yellow-muted: rgba(250, 189, 47, 0.12);
+  --accent-pink: #d3869b;
+  --accent-pink-muted: rgba(211, 134, 155, 0.12);
+
+  --signal-thought: #458588;
+  --signal-idea: #d79921;
+  --signal-question: #d3869b;
+  --signal-decision: #b8bb26;
+  --signal-system: #689d6a;
+  --signal-insight: #fe8019;
+
+  --btn-primary-bg: #d79921;
+  --btn-primary-text: #1d2021;
+  --btn-primary-hover: #fabd2f;
+  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #ebdbb2;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.10);
+
+  --border: rgba(255, 255, 255, 0.06);
+
+  --pressure-low: #b8bb26;
+  --pressure-medium: #fabd2f;
+  --pressure-high: #fb4934;
+
+  --cm-text: #ebdbb2;
+  --cm-text-bright: #fbf1c7;
+  --cm-cursor: #ebdbb2;
+  --cm-selection: rgba(215, 153, 33, 0.18);
+  --cm-selection-match: rgba(215, 153, 33, 0.1);
+  --cm-active-line: rgba(255, 255, 255, 0.02);
+  --cm-panel-bg: #282828;
+  --cm-gutter: rgba(102, 92, 84, 0.5);
+  --cm-gutter-active: #665c54;
+  --cm-search-match: rgba(250, 189, 47, 0.2);
+  --cm-search-match-outline: rgba(250, 189, 47, 0.4);
+  --cm-search-match-selected: rgba(250, 189, 47, 0.35);
+  --cm-matching-bracket: rgba(215, 153, 33, 0.25);
+  --cm-nonmatching-bracket: rgba(251, 73, 52, 0.25);
+  --cm-keyword: #fb4934;
+  --cm-heading: #d79921;
+  --cm-string: #b8bb26;
+  --cm-comment: #665c54;
+  --cm-link: #458588;
+  --cm-number: #d3869b;
+  --cm-function: #689d6a;
+  --cm-type: #d3869b;
+  --cm-operator: #8ec07c;
+  --cm-atom: #fe8019;
+  --cm-invalid: #fb4934;
+  --cm-list: #fe8019;
+  --cm-quote: #665c54;
+  --cm-monospace: #689d6a;
+  --cm-font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
 }

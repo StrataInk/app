@@ -176,5 +176,6 @@ const stubAPI: StrataAPI = {
 
 // Install the stub if we're not in Electron
 if (!window.strata) {
+  (window as unknown as Record<string, unknown>).__STRATA_WEB__ = true;
   window.strata = stubAPI;
 }

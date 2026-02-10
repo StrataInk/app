@@ -1,82 +1,76 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Sidebar, type View, type SidebarFilter } from './components/Sidebar';
+import { useEffect, useRef, useCallback } from 'react';
+import { Sidebar } from './components/Sidebar';
 import { NoteList } from './components/NoteList';
 import { TitleBar } from './components/TitleBar';
-import { Ribbon, type RibbonTab, type RibbonCommand } from './components/Ribbon';
+import { Ribbon, type RibbonCommand } from './components/Ribbon';
 import { SectionTabs } from './components/SectionTabs';
 import { EditorView } from './views/EditorView';
 import { CommandPalette } from './components/CommandPalette';
 import { ObserveView } from './views/ObserveView';
 import { SettingsView } from './views/SettingsView';
-import { usePreferences } from './state/PreferencesContext';
-import type { EntryMeta, Entry, Structure, Pressure } from './types';
-import type { EditorMode } from './components/editor/MarkdownEditor';
-import { getSectionsForNotebook, parseNotebookPath, buildNotebookPath } from './utils/notebook-hierarchy';
-import { v4 as uuid } from 'uuid';
+import { StatusBar } from './components/StatusBar';
+import { useAppStore, useSortedEntries, useSectionsForNotebook } from './state/store';
 
 export default function App() {
-  const { prefs } = usePreferences();
-  const [view, setView] = useState<View>('notes');
-  const [filter, setFilter] = useState<SidebarFilter>({ type: 'all' });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [entries, setEntries] = useState<EntryMeta[]>([]);
-  const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
-  const [notebooks, setNotebooks] = useState<string[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
+  // ── Store state ────────────────────────────────────────────────────
+  const view = useAppStore(s => s.view);
+  const filter = useAppStore(s => s.filter);
+  const activeEntry = useAppStore(s => s.activeEntry);
+  const entries = useAppStore(s => s.entries);
+  const selectedNotebook = useAppStore(s => s.selectedNotebook);
+  const selectedSection = useAppStore(s => s.selectedSection);
+  const editorMode = useAppStore(s => s.editorMode);
+  const ribbonTab = useAppStore(s => s.ribbonTab);
+  const ribbonCollapsed = useAppStore(s => s.ribbonCollapsed);
+  const drawingActive = useAppStore(s => s.drawingActive);
+  const showCommandPalette = useAppStore(s => s.showCommandPalette);
+  const showDebugBar = useAppStore(s => s.showDebugBar);
+  const sidebarCollapsed = useAppStore(s => s.sidebarCollapsed);
+  const saveStatus = useAppStore(s => s.saveStatus);
+  const lastAction = useAppStore(s => s.lastAction);
+  const notebooks = useAppStore(s => s.notebooks);
+
+  // ── Store actions ──────────────────────────────────────────────────
+  const loadEntries = useAppStore(s => s.loadEntries);
+  const loadMeta = useAppStore(s => s.loadMeta);
+  const openEntry = useAppStore(s => s.openEntry);
+  const createEntry = useAppStore(s => s.createEntry);
+  const saveEntry = useAppStore(s => s.saveEntry);
+  const trashEntry = useAppStore(s => s.trashEntry);
+  const restoreEntry = useAppStore(s => s.restoreEntry);
+  const deleteEntryPermanently = useAppStore(s => s.deleteEntryPermanently);
+  const pinEntry = useAppStore(s => s.pinEntry);
+  const unpinEntry = useAppStore(s => s.unpinEntry);
+  const createSection = useAppStore(s => s.createSection);
+  const renameSection = useAppStore(s => s.renameSection);
+  const reorderEntries = useAppStore(s => s.reorderEntries);
+  const setEditorMode = useAppStore(s => s.setEditorMode);
+  const setRibbonTab = useAppStore(s => s.setRibbonTab);
+  const setRibbonCollapsed = useAppStore(s => s.setRibbonCollapsed);
+  const setSelectedSection = useAppStore(s => s.setSelectedSection);
+  const setActiveEntry = useAppStore(s => s.setActiveEntry);
+
+  // ── Derived state ──────────────────────────────────────────────────
+  const sortedEntries = useSortedEntries();
+  const sectionsForNotebook = useSectionsForNotebook();
+
+  // ── Refs ────────────────────────────────────────────────────────────
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [showCommandPalette, setShowCommandPalette] = useState(false);
-  const [showDebugBar, setShowDebugBar] = useState(false);
-
-  // ── Notebook / Section Hierarchy ──────────────────────────────────
-  const [selectedNotebook, setSelectedNotebook] = useState<string | null>(null);
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
-
-  const sectionsForNotebook = useMemo(() => {
-    if (!selectedNotebook) return [];
-    return getSectionsForNotebook(notebooks, selectedNotebook);
-  }, [notebooks, selectedNotebook]);
-
-  const handleNotebookSelect = (nb: string | null) => {
-    setSelectedNotebook(nb);
-    setSelectedSection(null);
-  };
-
-  // ── Ribbon State ─────────────────────────────────────────────────────
-  const [ribbonTab, setRibbonTab] = useState<RibbonTab>('home');
-  const [ribbonCollapsed, setRibbonCollapsed] = useState(true);
-  const [editorMode, setEditorMode] = useState<EditorMode>(prefs.editorModeDefault);
-  const [drawingActive, setDrawingActive] = useState(false);
   const ribbonCommandRef = useRef<((cmd: RibbonCommand) => void) | null>(null);
 
   const handleRibbonCommand = (cmd: RibbonCommand) => {
     ribbonCommandRef.current?.(cmd);
   };
 
-  // ── Data Loading ───────────────────────────────────────────────────
-
-  const loadEntries = useCallback(async () => {
-    const list = await window.strata.listEntries();
-    setEntries(list);
-  }, []);
-
-  const loadMeta = useCallback(async () => {
-    const [nb, tg] = await Promise.all([
-      window.strata.listNotebooks(),
-      window.strata.listTags(),
-    ]);
-    setNotebooks(nb);
-    setTags(tg);
-  }, []);
-
+  // ── Initial data load ──────────────────────────────────────────────
   useEffect(() => {
     loadEntries();
     loadMeta();
   }, [loadEntries, loadMeta]);
 
-  // ── Filtered Entries ───────────────────────────────────────────────
-
-  const [searchResults, setSearchResults] = useState<EntryMeta[] | null>(null);
+  // ── Search debounce ────────────────────────────────────────────────
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const setSearchResults = useAppStore(s => s.setSearchResults);
 
   useEffect(() => {
     if (filter.type === 'search' && filter.query) {
@@ -88,63 +82,9 @@ export default function App() {
     } else {
       setSearchResults(null);
     }
-  }, [filter]);
+  }, [filter, setSearchResults]);
 
-  const filteredEntries = useMemo(() => {
-    let base: EntryMeta[];
-
-    if (filter.type === 'search') {
-      base = searchResults ?? [];
-    } else {
-      base = entries.filter(e => {
-        switch (filter.type) {
-          case 'all':
-            return !e.trashed && !e.archived;
-          case 'pinned':
-            return e.pinned && !e.trashed && !e.archived;
-          case 'archive':
-            return e.archived && !e.trashed;
-          case 'trash':
-            return e.trashed;
-          case 'notebook':
-            return e.notebook === filter.name && !e.trashed && !e.archived;
-          case 'tag':
-            return e.tags.includes(filter.name) && !e.trashed && !e.archived;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply notebook/section hierarchy filter
-    if (selectedNotebook && (filter.type === 'all' || filter.type === 'pinned' || filter.type === 'archive')) {
-      base = base.filter(e => {
-        const { notebook, section } = parseNotebookPath(e.notebook);
-        if (notebook !== selectedNotebook) return false;
-        if (selectedSection && section !== selectedSection) return false;
-        return true;
-      });
-    }
-
-    return base;
-  }, [entries, filter, searchResults, selectedNotebook, selectedSection]);
-
-  const sortedEntries = useMemo(() => {
-    return [...filteredEntries].sort((a, b) => {
-      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-      const aOrder = a.sortOrder ?? Infinity;
-      const bOrder = b.sortOrder ?? Infinity;
-      if (aOrder !== Infinity || bOrder !== Infinity) {
-        if (aOrder !== bOrder) return aOrder - bOrder;
-      }
-      return new Date(b.modified).getTime() - new Date(a.modified).getTime();
-    });
-  }, [filteredEntries]);
-
-  // ── Selection Guard ─────────────────────────────────────────────────
-  // If the active entry is no longer visible in the filtered list, clear it.
-  // This replaces the old aggressive `setActiveEntry(null)` on section change.
-
+  // ── Selection Guard ────────────────────────────────────────────────
   useEffect(() => {
     if (activeEntry && sortedEntries.length >= 0) {
       const stillVisible = sortedEntries.some(e => e.id === activeEntry.id);
@@ -153,155 +93,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedEntries]);
 
-  // ── Entry Actions ──────────────────────────────────────────────────
-
-  const openEntry = async (id: string) => {
-    const entry = await window.strata.readEntry(id);
-    if (entry) {
-      // If entry is in a different notebook/section, switch context
-      if (entry.notebook) {
-        const { notebook, section } = parseNotebookPath(entry.notebook);
-        if (notebook !== selectedNotebook) {
-          setSelectedNotebook(notebook);
-          setSelectedSection(section || null);
-          // Ensure we're not stuck in a narrow filter
-          if (filter.type === 'notebook' || filter.type === 'tag') {
-            setFilter({ type: 'all' });
-          }
-        } else if (section && section !== selectedSection) {
-          setSelectedSection(section || null);
-        }
-      }
-      setActiveEntry(entry);
-    }
-  };
-
-  const createEntry = useCallback(async () => {
-    const now = new Date().toISOString();
-    // Use selected notebook/section hierarchy for new entries
-    let nb = '';
-    if (filter.type === 'notebook') {
-      nb = filter.name;
-    } else if (selectedNotebook) {
-      nb = buildNotebookPath(selectedNotebook, selectedSection ?? '');
-    }
-    const tg = filter.type === 'tag' ? [filter.name] : [];
-    const entry: Entry = {
-      id: uuid(),
-      title: '',
-      structure: prefs.defaultStructure as Structure,
-      pressure: prefs.defaultPressure as Pressure,
-      pinned: false,
-      archived: false,
-      trashed: false,
-      notebook: nb,
-      tags: tg,
-      created: now,
-      modified: now,
-      body: '',
-    };
-    await window.strata.writeEntry(entry);
-    setActiveEntry(entry);
-    setView('notes');
-    await loadEntries();
-    await loadMeta();
-  }, [filter, selectedNotebook, selectedSection, prefs.defaultStructure, prefs.defaultPressure, loadEntries, loadMeta]);
-
-  const saveEntry = async (entry: Entry) => {
-    await window.strata.writeEntry(entry);
-    setActiveEntry(entry);
-    await loadEntries();
-    await loadMeta();
-  };
-
-  const trashEntry = async (id: string) => {
-    await window.strata.trashEntry(id);
-    setActiveEntry(null);
-    await loadEntries();
-  };
-
-  const restoreEntry = async (id: string) => {
-    await window.strata.restoreEntry(id);
-    setActiveEntry(null);
-    await loadEntries();
-  };
-
-  const deleteEntryPermanently = async (id: string) => {
-    await window.strata.deleteEntryPermanently(id);
-    setActiveEntry(null);
-    await loadEntries();
-    await loadMeta();
-  };
-
-  const pinEntry = async (id: string) => {
-    await window.strata.pinEntry(id);
-    if (activeEntry && activeEntry.id === id) {
-      setActiveEntry({ ...activeEntry, pinned: true });
-    }
-    await loadEntries();
-  };
-
-  const unpinEntry = async (id: string) => {
-    await window.strata.unpinEntry(id);
-    if (activeEntry && activeEntry.id === id) {
-      setActiveEntry({ ...activeEntry, pinned: false });
-    }
-    await loadEntries();
-  };
-
-  // ── Section Create / Rename ────────────────────────────────────────
-
-  const handleCreateSection = useCallback(async (sectionName: string) => {
-    if (!selectedNotebook || !sectionName.trim()) return;
-    const nb = buildNotebookPath(selectedNotebook, sectionName.trim());
-    const now = new Date().toISOString();
-    const entry: Entry = {
-      id: uuid(),
-      title: '',
-      structure: prefs.defaultStructure as Structure,
-      pressure: prefs.defaultPressure as Pressure,
-      pinned: false,
-      archived: false,
-      trashed: false,
-      notebook: nb,
-      tags: [],
-      created: now,
-      modified: now,
-      body: '',
-    };
-    await window.strata.writeEntry(entry);
-    await loadEntries();
-    await loadMeta();
-    setSelectedSection(sectionName.trim());
-  }, [selectedNotebook, prefs.defaultStructure, prefs.defaultPressure, loadEntries, loadMeta]);
-
-  const handleRenameSection = useCallback(async (oldName: string, newName: string) => {
-    if (!selectedNotebook || !newName.trim() || oldName === newName) return;
-    await window.strata.renameSection(selectedNotebook, oldName, newName.trim());
-    await loadEntries();
-    await loadMeta();
-    if (selectedSection === oldName) {
-      setSelectedSection(newName.trim());
-    }
-    // Fix: update activeEntry's notebook if it was in the renamed section
-    if (activeEntry) {
-      const oldPath = (!oldName || oldName === 'General') ? selectedNotebook : `${selectedNotebook}/${oldName}`;
-      const newPath = (!newName.trim() || newName.trim() === 'General') ? selectedNotebook : `${selectedNotebook}/${newName.trim()}`;
-      if (activeEntry.notebook === oldPath) {
-        setActiveEntry({ ...activeEntry, notebook: newPath });
-      }
-    }
-  }, [selectedNotebook, selectedSection, activeEntry, loadEntries, loadMeta]);
-
-  // ── Page Reorder ──────────────────────────────────────────────────
-
-  const handleReorder = useCallback(async (updates: { id: string; sortOrder: number }[]) => {
-    await window.strata.reorderEntries(updates);
-    await loadEntries();
-  }, [loadEntries]);
-
-  // ── Keyboard Navigation ──────────────────────────────────────────
-
+  // ── Navigation ─────────────────────────────────────────────────────
   const navigateEntryList = useCallback((delta: number) => {
     if (sortedEntries.length === 0) return;
     const currentIndex = activeEntry
@@ -322,6 +114,8 @@ export default function App() {
   }, [sortedEntries, activeEntry, openEntry]);
 
   // ── Keyboard Shortcuts ─────────────────────────────────────────────
+  const toggleCommandPalette = useAppStore(s => s.toggleCommandPalette);
+  const toggleDebugBar = useAppStore(s => s.toggleDebugBar);
 
   useEffect(() => {
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
@@ -335,7 +129,7 @@ export default function App() {
         searchInputRef.current?.focus();
       } else if (mod && e.key === 'k') {
         e.preventDefault();
-        setShowCommandPalette(prev => !prev);
+        toggleCommandPalette();
       } else if (e.altKey && e.key === 'ArrowUp') {
         e.preventDefault();
         navigateEntryList(-1);
@@ -348,17 +142,16 @@ export default function App() {
       } else if (mod && e.shiftKey && e.key === 'D') {
         if (import.meta.env.DEV) {
           e.preventDefault();
-          setShowDebugBar(prev => !prev);
+          toggleDebugBar();
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [createEntry, navigateEntryList]);
+  }, [createEntry, navigateEntryList, toggleCommandPalette, toggleDebugBar]);
 
-  // ── Sync editing state to root for CSS ────────────────────────────
-
+  // ── Sync editing state to root for CSS ─────────────────────────────
   useEffect(() => {
     const root = document.getElementById('root');
     if (root) {
@@ -371,7 +164,6 @@ export default function App() {
   }, [activeEntry]);
 
   // ── Render ─────────────────────────────────────────────────────────
-
   const showSectionTabs = view === 'notes' && selectedNotebook && sectionsForNotebook.length > 0;
 
   return (
@@ -382,21 +174,10 @@ export default function App() {
         onRibbonTabActivate={setRibbonTab}
         activeRibbonTab={ribbonTab}
         hasActiveEntry={!!activeEntry && view === 'notes'}
+        onToggleSidebar={() => useAppStore.getState().toggleSidebar()}
       />
       <div className="app-body">
-        <Sidebar
-          filter={filter}
-          onFilterChange={setFilter}
-          view={view}
-          onViewChange={setView}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          notebooks={notebooks}
-          tags={tags}
-          searchInputRef={searchInputRef}
-          selectedNotebook={selectedNotebook}
-          onNotebookSelect={handleNotebookSelect}
-        />
+        <Sidebar searchInputRef={searchInputRef} collapsed={sidebarCollapsed} />
 
         <div className="app-main">
           {showSectionTabs && (
@@ -404,8 +185,8 @@ export default function App() {
               sections={sectionsForNotebook}
               activeSection={selectedSection}
               onSectionSelect={setSelectedSection}
-              onCreateSection={handleCreateSection}
-              onRenameSection={handleRenameSection}
+              onCreateSection={createSection}
+              onRenameSection={renameSection}
             />
           )}
 
@@ -416,7 +197,7 @@ export default function App() {
               editorMode={editorMode}
               onModeChange={setEditorMode}
               drawingActive={drawingActive}
-              onDrawingToggle={() => setDrawingActive(prev => !prev)}
+              onDrawingToggle={() => useAppStore.getState().toggleDrawing()}
               collapsed={ribbonCollapsed}
             />
           )}
@@ -432,7 +213,7 @@ export default function App() {
                 onUnpin={unpinEntry}
                 onTrash={trashEntry}
                 filter={filter}
-                onReorder={handleReorder}
+                onReorder={reorderEntries}
               />
               <div className="editor-pane">
                 <div className="editor-pane-content">
@@ -474,14 +255,8 @@ export default function App() {
           )}
         </div>
       </div>
-      {showCommandPalette && (
-        <CommandPalette
-          entries={entries}
-          onClose={() => setShowCommandPalette(false)}
-          onNewPage={() => { setShowCommandPalette(false); createEntry(); }}
-          onJumpToPage={(id) => { setShowCommandPalette(false); openEntry(id); }}
-        />
-      )}
+      {activeEntry && view === 'notes' && <StatusBar />}
+      {showCommandPalette && <CommandPalette />}
       {import.meta.env.DEV && showDebugBar && (
         <div className="debug-bar">
           <span>notebook: {selectedNotebook ?? '(none)'}</span>
@@ -490,6 +265,8 @@ export default function App() {
           <span>filter: {filter.type}{filter.type === 'notebook' || filter.type === 'tag' ? `:${filter.name}` : ''}</span>
           <span>entries: {entries.length}</span>
           <span>visible: {sortedEntries.length}</span>
+          <span>save: {saveStatus}</span>
+          <span>last: {lastAction}</span>
         </div>
       )}
     </div>

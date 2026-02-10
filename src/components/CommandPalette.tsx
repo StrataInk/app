@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import type { EntryMeta } from '../types';
+import { useAppStore } from '../state/store';
 
 interface CommandPaletteAction {
   id: string;
@@ -8,14 +8,12 @@ interface CommandPaletteAction {
   onExecute: () => void;
 }
 
-interface CommandPaletteProps {
-  entries: EntryMeta[];
-  onClose: () => void;
-  onNewPage: () => void;
-  onJumpToPage: (id: string) => void;
-}
+export function CommandPalette() {
+  const entries = useAppStore(s => s.entries);
+  const openEntry = useAppStore(s => s.openEntry);
+  const createEntry = useAppStore(s => s.createEntry);
+  const toggleCommandPalette = useAppStore(s => s.toggleCommandPalette);
 
-export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,7 +25,12 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
 
   const actions: CommandPaletteAction[] = useMemo(() => {
     const staticActions: CommandPaletteAction[] = [
-      { id: 'new-page', label: 'New Page', category: 'action', onExecute: onNewPage },
+      {
+        id: 'new-page',
+        label: 'New Page',
+        category: 'action',
+        onExecute: () => { toggleCommandPalette(); createEntry(); },
+      },
     ];
 
     const pageActions: CommandPaletteAction[] = entries
@@ -36,7 +39,7 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
         id: `page-${e.id}`,
         label: e.title || 'Untitled',
         category: 'page' as const,
-        onExecute: () => onJumpToPage(e.id),
+        onExecute: () => { toggleCommandPalette(); openEntry(e.id); },
       }));
 
     const all = [...staticActions, ...pageActions];
@@ -44,7 +47,7 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
 
     const q = query.toLowerCase();
     return all.filter(a => a.label.toLowerCase().includes(q));
-  }, [query, entries, onNewPage, onJumpToPage]);
+  }, [query, entries, openEntry, createEntry, toggleCommandPalette]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -52,7 +55,7 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onClose();
+      toggleCommandPalette();
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex(i => Math.min(i + 1, actions.length - 1));
@@ -63,7 +66,6 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
       e.preventDefault();
       if (actions[selectedIndex]) {
         actions[selectedIndex].onExecute();
-        onClose();
       }
     }
   };
@@ -75,7 +77,7 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
   }, [selectedIndex]);
 
   return (
-    <div className="command-palette-overlay" onClick={onClose}>
+    <div className="command-palette-overlay" onClick={() => toggleCommandPalette()}>
       <div className="command-palette" onClick={e => e.stopPropagation()}>
         <input
           ref={inputRef}
@@ -94,10 +96,7 @@ export function CommandPalette({ entries, onClose, onNewPage, onJumpToPage }: Co
               <div
                 key={action.id}
                 className={`command-palette-item${i === selectedIndex ? ' selected' : ''}`}
-                onClick={() => {
-                  action.onExecute();
-                  onClose();
-                }}
+                onClick={() => action.onExecute()}
                 onMouseEnter={() => setSelectedIndex(i)}
               >
                 <span className="command-palette-item-label">{action.label}</span>

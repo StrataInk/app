@@ -1477,7 +1477,7 @@
 
 .settings-theme-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 12px;
 }
 
@@ -1795,4 +1795,117 @@
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 11px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Toast ─────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 20px;
+  background-color: var(--bg-list);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: toast-in 200ms ease;
+  pointer-events: none;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Status Bar ──────────────────────────────────── */
+
+.status-bar {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background-color: var(--bg-sidebar);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.status-bar-item {
+  white-space: nowrap;
+}
+
+.status-bar-spacer {
+  flex: 1;
+}
+
+.status-bar-save {
+  font-weight: 500;
+}
+
+.status-bar-save.saving {
+  color: var(--accent);
+}
+
+.status-bar-save.saved {
+  color: var(--text-muted);
+}
+
+.status-bar-save.error {
+  color: var(--signal-decision);
+}
+
+/* ── Sidebar Toggle (Hamburger) ──────────────────── */
+
+.titlebar-hamburger {
+  -webkit-app-region: no-drag;
+  margin-right: 8px;
+}
+
+/* ── Sidebar Collapsed State ─────────────────────── */
+
+.sidebar--collapsed {
+  display: none;
+}
+
+/* ── Responsive Breakpoints ──────────────────────── */
+
+@media (max-width: 900px) {
+  .sidebar:not(.sidebar--collapsed) {
+    position: absolute;
+    z-index: 100;
+    height: 100%;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@media (max-width: 700px) {
+  .notelist {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .editor-pane {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+  }
+
+  .editor-pane-content {
+    padding: 24px 20px 48px;
+  }
+
+  #root:not([data-editing="true"]) .editor-pane {
+    display: none;
+  }
+
+  #root[data-editing="true"] .notelist {
+    display: none;
+  }
 }

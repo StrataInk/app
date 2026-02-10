@@ -1,0 +1,66 @@
+:root {
+  /* ── Nord Palette ──────────────────────────────── */
+  --nord0: #2e3440;
+  --nord1: #3b4252;
+  --nord2: #434c5e;
+  --nord3: #4c566a;
+
+  --nord4: #d8dee9;
+  --nord5: #e5e9f0;
+  --nord6: #eceff4;
+
+  --nord7: #8fbcbb;
+  --nord8: #88c0d0;
+  --nord9: #81a1c1;
+  --nord10: #5e81ac;
+
+  --nord11: #bf616a;
+  --nord12: #d08770;
+  --nord13: #ebcb8b;
+  --nord14: #a3be8c;
+  --nord15: #b48ead;
+
+  /* ── 3 Surface Tones (dark → light, left → right) ── */
+  --bg-sidebar: #1e222a;
+  --bg-list: #252a34;
+  --bg-canvas: #2e3440;
+
+  /* Overlay surfaces — adapt to any background */
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-active: rgba(255, 255, 255, 0.07);
+  --bg-input: rgba(0, 0, 0, 0.15);
+
+  /* ── Text ──────────────────────────────────────── */
+  --text-primary: #d8dee9;
+  --text-secondary: #8a95a5;
+  --text-muted: #5c6777;
+  --text-heading: #eceff4;
+
+  /* ── Accent ────────────────────────────────────── */
+  --accent: #81a1c1;
+
+  /* ── Signal Accents (structure-specific, used sparingly) ── */
+  --signal-thought: #81a1c1;
+  --signal-idea: #ebcb8b;
+  --signal-question: #b48ead;
+  --signal-decision: #a3be8c;
+  --signal-system: #8fbcbb;
+  --signal-insight: #d08770;
+
+  /* ── Border ─────────────────────────────────────── */
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* ── Pressure ──────────────────────────────────── */
+  --pressure-low: #a3be8c;
+  --pressure-medium: #ebcb8b;
+  --pressure-high: #bf616a;
+
+  /* ── Layout ────────────────────────────────────── */
+  --sidebar-width: 260px;
+  --notelist-width: 340px;
+  --topbar-height: 44px;
+
+  /* ── Shape ─────────────────────────────────────── */
+  --radius: 6px;
+  --transition: 120ms ease;
+}

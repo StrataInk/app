@@ -1,7 +1,46 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(where:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(node --version:*)",
+      "Bash(pnpm init:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npx electron:*)",
+      "Bash(npx vite:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm list:*)",
+      "Bash(node -e:*)",
+      "Bash(gh issue view:*)",
+      "WebFetch(domain:www.electronjs.org)",
+      "Bash(wmic datafile where \"name=''e:\\\\\\\\PROJECTS\\\\\\\\app\\\\\\\\node_modules\\\\\\\\electron\\\\\\\\dist\\\\\\\\electron.exe''\" get FileSize)",
+      "Bash(powershell -c:*)",
+      "Bash(ls:*)",
+      "Bash(cmd //c \"cd /d e:\\\\PROJECTS\\\\app && node_modules\\\\electron\\\\dist\\\\electron.exe . --no-sandbox\")",
+      "Bash(echo:*)",
+      "Bash(ELECTRON_RUN_AS_NODE= npx electron:*)",
+      "Bash(unset:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd //c \"taskkill /F /IM electron.exe\")",
+      "Bash(timeout:*)",
+      "WebFetch(domain:standardnotes.com)",
+      "WebFetch(domain:inkdrop.app)",
+      "WebFetch(domain:docs.inkdrop.app)",
+      "WebFetch(domain:my.inkdrop.app)",
+      "WebFetch(domain:developers.inkdrop.app)",
+      "WebFetch(domain:docs.standardnotes.com)",
+      "Bash(pnpm remove:*)",
+      "Bash(del \"src\\\\components\\\\editor\\\\useMarkdownEditor.ts\" \"src\\\\components\\\\editor\\\\EditorToolbar.tsx\" \"src\\\\components\\\\editor\\\\toolbar-icons.tsx\" \"src\\\\components\\\\editor\\\\EditorPreview.tsx\")",
+      "Bash(ping:*)",
+      "Bash(findstr:*)",
+      "Bash(git mv:*)",
+      "Bash(pnpm run build:web:*)",
+      "Bash(node scripts/build-netlify.mjs:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)"
     ]
   }
 }

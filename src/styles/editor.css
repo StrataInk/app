@@ -1,0 +1,292 @@
+/* ── Markdown Editor — Canvas ─────────────────────────────────── */
+
+.md-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Mode Toggle ───────────────────────────────────────────────── */
+
+.md-editor-mode-toggle {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+.md-mode-btn {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.md-mode-btn:hover {
+  color: var(--text-secondary);
+}
+
+.md-mode-btn.active {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+/* ── Editor Body ───────────────────────────────────────────────── */
+
+.md-editor-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── Split View ────────────────────────────────────────────────── */
+
+.md-editor-split {
+  display: flex;
+  overflow: hidden;
+}
+
+.md-editor-split-pane {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.md-editor-split .md-editor-cm {
+  border-right: 1px solid var(--border);
+}
+
+/* ── CodeMirror Container ──────────────────────────────────────── */
+
+.md-editor-cm {
+  height: 100%;
+}
+
+.md-editor-cm .cm-editor {
+  height: 100%;
+  outline: none;
+}
+
+.md-editor-cm .cm-scroller {
+  overflow: auto;
+  font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+}
+
+/* ── Preview ───────────────────────────────────────────────────── */
+
+.md-editor-preview {
+  padding: 0 4px 48px;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.75;
+  cursor: default;
+}
+
+.md-editor-preview > *:first-child {
+  margin-top: 0;
+}
+
+/* Headings */
+.md-editor-preview h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin: 32px 0 12px;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.md-editor-preview h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin: 28px 0 8px;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.md-editor-preview h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin: 24px 0 6px;
+  line-height: 1.4;
+}
+
+.md-editor-preview h4,
+.md-editor-preview h5,
+.md-editor-preview h6 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin: 20px 0 4px;
+}
+
+/* Paragraphs */
+.md-editor-preview p {
+  margin: 0 0 12px;
+}
+
+/* Inline formatting */
+.md-editor-preview strong {
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.md-editor-preview em {
+  font-style: italic;
+}
+
+.md-editor-preview s {
+  color: var(--text-muted);
+}
+
+/* Inline code */
+.md-editor-preview code {
+  background-color: var(--bg-surface);
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 14px;
+  color: var(--nord8);
+}
+
+/* Code blocks */
+.md-editor-preview pre {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.md-editor-preview pre code {
+  background: none;
+  padding: 0;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+/* Blockquote */
+.md-editor-preview blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 20px;
+  margin: 16px 0;
+  color: var(--text-secondary);
+}
+
+.md-editor-preview blockquote p {
+  margin: 0;
+}
+
+/* Lists */
+.md-editor-preview ul,
+.md-editor-preview ol {
+  padding-left: 24px;
+  margin: 8px 0;
+}
+
+.md-editor-preview ul {
+  list-style: disc;
+}
+
+.md-editor-preview ol {
+  list-style: decimal;
+}
+
+.md-editor-preview li {
+  margin: 4px 0;
+}
+
+.md-editor-preview li p {
+  margin: 0;
+}
+
+/* Task list (GFM) */
+.md-editor-preview input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--text-muted);
+  border-radius: 3px;
+  background-color: transparent;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-right: 6px;
+  position: relative;
+}
+
+.md-editor-preview input[type="checkbox"]:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.md-editor-preview input[type="checkbox"]:checked::after {
+  content: '\2713';
+  color: var(--nord0);
+  font-size: 10px;
+  position: absolute;
+  top: 0;
+  left: 2px;
+  font-weight: bold;
+}
+
+/* Highlight */
+.md-editor-preview mark {
+  background-color: rgba(235, 203, 139, 0.15);
+  color: var(--nord13);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+/* Links */
+.md-editor-preview a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(129, 161, 193, 0.3);
+  text-underline-offset: 2px;
+}
+
+.md-editor-preview a:hover {
+  text-decoration-color: var(--accent);
+}
+
+/* Horizontal rule */
+.md-editor-preview hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+/* Tables (GFM) */
+.md-editor-preview table {
+  border-collapse: collapse;
+  margin: 16px 0;
+  width: 100%;
+}
+
+.md-editor-preview th,
+.md-editor-preview td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.md-editor-preview th {
+  background-color: var(--bg-surface);
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+/* Images */
+.md-editor-preview img {
+  max-width: 100%;
+  border-radius: var(--radius);
+  margin: 8px 0;
+}

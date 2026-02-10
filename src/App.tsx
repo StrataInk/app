@@ -319,6 +319,7 @@ export default function App() {
                       editorMode={editorMode}
                       onRibbonCommandRef={(fn) => { ribbonCommandRef.current = fn; }}
                       drawingActive={drawingActive}
+                      sectionBreadcrumb={selectedNotebook ? { notebook: selectedNotebook, section: selectedSection } : undefined}
                     />
                   ) : (
                     <div className="empty">

@@ -18,6 +18,7 @@ interface EditorViewProps {
   editorMode: EditorMode;
   onRibbonCommandRef: (fn: (cmd: RibbonCommand) => void) => void;
   drawingActive: boolean;
+  sectionBreadcrumb?: { notebook: string; section: string | null };
 }
 
 const STRUCTURES: Structure[] = ['thought', 'idea', 'question', 'decision', 'system', 'insight'];
@@ -35,6 +36,7 @@ export function EditorView({
   editorMode,
   onRibbonCommandRef,
   drawingActive,
+  sectionBreadcrumb,
 }: EditorViewProps) {
   const [title, setTitle] = useState(entry.title);
   const [body, setBody] = useState(entry.body);
@@ -265,6 +267,14 @@ export function EditorView({
 
   return (
     <div className="editor" data-structure={structure} data-pressure={pressure} ref={editorContainerRef}>
+      {sectionBreadcrumb && (
+        <div className="editor-breadcrumb">
+          {sectionBreadcrumb.notebook}
+          {sectionBreadcrumb.section && (
+            <> <span className="editor-breadcrumb-sep">›</span> {sectionBreadcrumb.section}</>
+          )}
+        </div>
+      )}
       <input
         className="editor-title"
         type="text"

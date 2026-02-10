@@ -301,22 +301,22 @@
 .notelist-body {
   flex: 1;
   overflow-y: auto;
-  padding: 0 6px 6px;
+  padding: 4px 6px 6px;
 }
 
-/* ── Note Card — Inkdrop style ─────────────────────── */
+/* ── Note Card — stacked page style ──────────────────── */
 
 .note-card {
-  padding: 10px 12px 10px 14px;
+  padding: 11px 12px 11px 14px;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background-color var(--transition);
+  transition: background-color var(--transition), box-shadow var(--transition);
   display: flex;
   flex-direction: column;
   gap: 4px;
   position: relative;
   border-left: 2px solid transparent;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
 }
 
 .note-card[data-structure="thought"] { border-left-color: var(--signal-thought); }
@@ -333,6 +333,8 @@
 .note-card.selected {
   background-color: var(--bg-surface-active);
   border-left-color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  z-index: 1;
 }
 
 .note-card.selected::before {
@@ -528,7 +530,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 56px 48px 48px;
+  padding: 48px 56px 64px;
   overflow-y: auto;
   min-height: 0;
 }
@@ -677,6 +679,21 @@
   min-height: 0;
 }
 
+/* Section breadcrumb — subtle workspace context */
+.editor-breadcrumb {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  letter-spacing: 0.01em;
+}
+
+.editor-breadcrumb-sep {
+  color: var(--text-muted);
+  opacity: 0.5;
+  margin: 0 2px;
+}
+
 /* Page title — large, authoritative, no input chrome */
 .editor-title {
   font-size: 36px;
@@ -701,9 +718,9 @@
 /* ── Editor Header — signal controls ─────────────── */
 
 .editor-header {
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   display: flex;
   flex-direction: column;
   gap: 8px;

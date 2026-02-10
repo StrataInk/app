@@ -347,6 +347,18 @@ function registerIPC(): void {
   ipcMain.handle('get-connections', () => readConnections().connections);
   ipcMain.handle('add-connection', (_e, conn: Connection) => addConnection(conn));
   ipcMain.handle('remove-connection', (_e, from: string, to: string) => removeConnection(from, to));
+
+  // Window controls
+  ipcMain.handle('window-minimize', () => mainWindow?.minimize());
+  ipcMain.handle('window-maximize', () => {
+    if (mainWindow?.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow?.maximize();
+    }
+  });
+  ipcMain.handle('window-close', () => mainWindow?.close());
+  ipcMain.handle('window-is-maximized', () => mainWindow?.isMaximized() ?? false);
 }
 
 // ── Window ──────────────────────────────────────────────────────────
@@ -360,6 +372,8 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 520,
     backgroundColor: '#2e3440',
+    frame: false,
+    titleBarStyle: 'hidden',
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

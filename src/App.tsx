@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Sidebar, type View, type SidebarFilter } from './components/Sidebar';
 import { NoteList } from './components/NoteList';
+import { TitleBar } from './components/TitleBar';
+import { Ribbon, type RibbonTab, type RibbonCommand } from './components/Ribbon';
 import { EditorView } from './views/EditorView';
 import { ObserveView } from './views/ObserveView';
 import { SettingsView } from './views/SettingsView';
 import type { EntryMeta, Entry } from './types';
+import type { EditorMode } from './components/editor/MarkdownEditor';
 import { v4 as uuid } from 'uuid';
 
 export default function App() {
@@ -16,6 +19,17 @@ export default function App() {
   const [notebooks, setNotebooks] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Ribbon State ─────────────────────────────────────────────────────
+  const [ribbonTab, setRibbonTab] = useState<RibbonTab>('home');
+  const [editorMode, setEditorMode] = useState<EditorMode>('write');
+  const [drawingActive, setDrawingActive] = useState(false);
+  const ribbonCommandRef = useRef<((cmd: RibbonCommand) => void) | null>(null);
+
+  const handleRibbonCommand = (cmd: RibbonCommand) => {
+    // Forward to the active EditorView via ref callback
+    ribbonCommandRef.current?.(cmd);
+  };
 
   // ── Data Loading ───────────────────────────────────────────────────
 
@@ -191,63 +205,83 @@ export default function App() {
   // ── Render ─────────────────────────────────────────────────────────
 
   return (
-    <>
-      <Sidebar
-        filter={filter}
-        onFilterChange={setFilter}
-        view={view}
-        onViewChange={setView}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        notebooks={notebooks}
-        tags={tags}
-        searchInputRef={searchInputRef}
-      />
+    <div className="app-shell">
+      <TitleBar />
+      <div className="app-body">
+        <Sidebar
+          filter={filter}
+          onFilterChange={setFilter}
+          view={view}
+          onViewChange={setView}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          notebooks={notebooks}
+          tags={tags}
+          searchInputRef={searchInputRef}
+        />
 
-      {view === 'notes' ? (
-        <>
-          <NoteList
-            entries={filteredEntries}
-            activeId={activeEntry?.id ?? null}
-            onSelect={openEntry}
-            onCreate={createEntry}
-            onPin={pinEntry}
-            onUnpin={unpinEntry}
-            onTrash={trashEntry}
-            filter={filter}
-          />
-          <div className="editor-pane">
-            <div className="editor-pane-content">
-              {activeEntry ? (
-                <EditorView
-                  entry={activeEntry}
-                  notebooks={notebooks}
-                  onSave={saveEntry}
-                  onTrash={trashEntry}
-                  onRestore={restoreEntry}
-                  onDeletePermanently={deleteEntryPermanently}
-                  onPin={pinEntry}
-                  onUnpin={unpinEntry}
-                />
-              ) : (
-                <div className="empty">
-                  <p>Select a note or press <kbd>Ctrl+N</kbd> to create one.</p>
+        <div className="app-main">
+          {view === 'notes' && activeEntry && (
+            <Ribbon
+              activeTab={ribbonTab}
+              onTabChange={setRibbonTab}
+              onCommand={handleRibbonCommand}
+              editorMode={editorMode}
+              onModeChange={setEditorMode}
+              drawingActive={drawingActive}
+              onDrawingToggle={() => setDrawingActive(prev => !prev)}
+            />
+          )}
+
+          {view === 'notes' ? (
+            <div className="app-content">
+              <NoteList
+                entries={filteredEntries}
+                activeId={activeEntry?.id ?? null}
+                onSelect={openEntry}
+                onCreate={createEntry}
+                onPin={pinEntry}
+                onUnpin={unpinEntry}
+                onTrash={trashEntry}
+                filter={filter}
+              />
+              <div className="editor-pane">
+                <div className="editor-pane-content">
+                  {activeEntry ? (
+                    <EditorView
+                      entry={activeEntry}
+                      notebooks={notebooks}
+                      onSave={saveEntry}
+                      onTrash={trashEntry}
+                      onRestore={restoreEntry}
+                      onDeletePermanently={deleteEntryPermanently}
+                      onPin={pinEntry}
+                      onUnpin={unpinEntry}
+                      editorMode={editorMode}
+                      onRibbonCommandRef={(fn) => { ribbonCommandRef.current = fn; }}
+                      drawingActive={drawingActive}
+                    />
+                  ) : (
+                    <div className="empty">
+                      <p>Select a note or press <kbd>Ctrl+N</kbd> to create one.</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
-          </div>
-        </>
-      ) : (
-        <div className="full-content">
-          <div className="full-content-header">
-            {view === 'observe' ? 'Observe' : 'Settings'}
-          </div>
-          <div className="full-content-body">
-            {view === 'observe' && <ObserveView entries={entries} />}
-            {view === 'settings' && <SettingsView />}
-          </div>
+          ) : (
+            <div className="full-content">
+              <div className="full-content-header">
+                {view === 'observe' ? 'Observe' : 'Settings'}
+              </div>
+              <div className="full-content-body">
+                {view === 'observe' && <ObserveView entries={entries} />}
+                {view === 'settings' && <SettingsView />}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }

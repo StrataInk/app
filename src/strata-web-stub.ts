@@ -128,6 +128,10 @@ const stubAPI: StrataAPI = {
   getConnections: async () => [],
   addConnection: async () => {},
   removeConnection: async () => {},
+  windowMinimize: async () => {},
+  windowMaximize: async () => {},
+  windowClose: async () => {},
+  windowIsMaximized: async () => false,
 };
 
 // Install the stub if we're not in Electron

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
+import { useState, useEffect, useRef, useCallback, type KeyboardEvent } from 'react';
 import { Pin, PinOff, Trash2, RotateCcw, X } from 'lucide-react';
 import type { Entry, Structure, Pressure } from '../types';
 import { MarkdownEditor, type EditorMode } from '../components/editor/MarkdownEditor';
+import type { RibbonCommand } from '../components/Ribbon';
+import { DrawCanvas, type DrawTool } from '../components/DrawCanvas';
 
 interface EditorViewProps {
   entry: Entry;
@@ -12,11 +14,13 @@ interface EditorViewProps {
   onDeletePermanently: (id: string) => void;
   onPin: (id: string) => void;
   onUnpin: (id: string) => void;
+  editorMode: EditorMode;
+  onRibbonCommandRef: (fn: (cmd: RibbonCommand) => void) => void;
+  drawingActive: boolean;
 }
 
 const STRUCTURES: Structure[] = ['thought', 'idea', 'question', 'decision', 'system', 'insight'];
 const PRESSURES: Pressure[] = ['low', 'medium', 'high'];
-const MODES: EditorMode[] = ['write', 'split', 'preview'];
 
 export function EditorView({
   entry,
@@ -27,6 +31,9 @@ export function EditorView({
   onDeletePermanently,
   onPin,
   onUnpin,
+  editorMode,
+  onRibbonCommandRef,
+  drawingActive,
 }: EditorViewProps) {
   const [title, setTitle] = useState(entry.title);
   const [body, setBody] = useState(entry.body);
@@ -35,8 +42,11 @@ export function EditorView({
   const [notebook, setNotebook] = useState(entry.notebook);
   const [tags, setTags] = useState<string[]>(entry.tags);
   const [tagInput, setTagInput] = useState('');
-  const [editorMode, setEditorMode] = useState<EditorMode>('write');
+  const [drawTool, setDrawTool] = useState<DrawTool>('pen');
+  const [drawColor, setDrawColor] = useState('#d8dee9');
+  const [drawSize, setDrawSize] = useState(2);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   // Reset state when entry changes
   useEffect(() => {
@@ -115,6 +125,74 @@ export function EditorView({
     }
   };
 
+  // ── Ribbon Command Handler ─────────────────────────────────────────
+
+  const handleRibbonCommand = useCallback((cmd: RibbonCommand) => {
+    // TODO: Wire format/insert commands to CodeMirror when we have a ref
+    // For now, handle insert commands by modifying body directly
+    if (cmd.type === 'insert') {
+      let snippet = '';
+      switch (cmd.payload) {
+        case 'table':
+          snippet = '\n| Column 1 | Column 2 | Column 3 |\n|----------|----------|----------|\n| Cell     | Cell     | Cell     |\n';
+          break;
+        case 'link':
+          snippet = '[link text](url)';
+          break;
+        case 'image':
+          snippet = '![alt text](image-url)';
+          break;
+        case 'code-block':
+          snippet = '\n```\ncode here\n```\n';
+          break;
+        case 'divider':
+          snippet = '\n---\n';
+          break;
+        case 'date':
+          snippet = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          break;
+      }
+      if (snippet) {
+        const newBody = body + snippet;
+        setBody(newBody);
+        queueSave({ body: newBody });
+      }
+    } else if (cmd.type === 'format') {
+      // Wrap selection or append format markers
+      let prefix = '';
+      let suffix = '';
+      switch (cmd.payload) {
+        case 'bold': prefix = '**'; suffix = '**'; break;
+        case 'italic': prefix = '_'; suffix = '_'; break;
+        case 'underline': prefix = '<u>'; suffix = '</u>'; break;
+        case 'strikethrough': prefix = '~~'; suffix = '~~'; break;
+        case 'highlight': prefix = '=='; suffix = '=='; break;
+        case 'h1': prefix = '\n# '; break;
+        case 'h2': prefix = '\n## '; break;
+        case 'h3': prefix = '\n### '; break;
+        case 'bullet-list': prefix = '\n- '; break;
+        case 'ordered-list': prefix = '\n1. '; break;
+        case 'task-list': prefix = '\n- [ ] '; break;
+        case 'paragraph': break;
+      }
+      if (prefix || suffix) {
+        const newBody = body + prefix + (suffix ? 'text' + suffix : '');
+        setBody(newBody);
+        queueSave({ body: newBody });
+      }
+    } else if (cmd.type === 'draw-tool') {
+      setDrawTool(cmd.payload as DrawTool);
+    } else if (cmd.type === 'draw-color') {
+      setDrawColor(cmd.payload!);
+    } else if (cmd.type === 'draw-size') {
+      setDrawSize(Number(cmd.payload));
+    }
+  }, [body]);
+
+  useEffect(() => {
+    onRibbonCommandRef(handleRibbonCommand);
+  }, [handleRibbonCommand, onRibbonCommandRef]);
+
   if (entry.trashed) {
     return (
       <div className="editor">
@@ -150,7 +228,7 @@ export function EditorView({
   }
 
   return (
-    <div className="editor" data-structure={structure} data-pressure={pressure}>
+    <div className="editor" data-structure={structure} data-pressure={pressure} ref={editorContainerRef}>
       <input
         className="editor-title"
         type="text"
@@ -231,28 +309,20 @@ export function EditorView({
               />
             </div>
           </label>
-          <span style={{ flex: 1 }} />
-          <div className="md-editor-mode-toggle">
-            {MODES.map(m => (
-              <button
-                key={m}
-                className={`md-mode-btn ${editorMode === m ? 'active' : ''}`}
-                onClick={() => setEditorMode(m)}
-                type="button"
-              >
-                {m.charAt(0).toUpperCase() + m.slice(1)}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
-      <MarkdownEditor
-        markdown={body}
-        onChange={handleBody}
-        entryId={entry.id}
-        mode={editorMode}
-      />
+      <div className="editor-canvas-wrap">
+        <MarkdownEditor
+          markdown={body}
+          onChange={handleBody}
+          entryId={entry.id}
+          mode={editorMode}
+        />
+        {drawingActive && (
+          <DrawCanvas tool={drawTool} color={drawColor} size={drawSize} />
+        )}
+      </div>
     </div>
   );
 }

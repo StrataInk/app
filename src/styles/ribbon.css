@@ -1,0 +1,278 @@
+/* ══════════════════════════════════════════════════════
+   TitleBar — Custom frameless window chrome
+   ══════════════════════════════════════════════════════ */
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  min-height: 32px;
+  background-color: var(--bg-sidebar);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.titlebar-drag {
+  flex: 1;
+  -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-left: 14px;
+}
+
+.titlebar-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.titlebar-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+  height: 100%;
+}
+
+.titlebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 100%;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.titlebar-btn:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.titlebar-btn--close:hover {
+  background-color: #c42b1c;
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════
+   Ribbon — OneNote-style toolbar
+   ══════════════════════════════════════════════════════ */
+
+.ribbon {
+  background-color: var(--bg-list);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.ribbon-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ribbon-tab {
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 120ms ease;
+}
+
+.ribbon-tab:hover {
+  color: var(--text-secondary);
+}
+
+.ribbon-tab.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.ribbon-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: 1px;
+}
+
+.ribbon-body {
+  display: flex;
+  align-items: stretch;
+  padding: 6px 12px;
+  gap: 0;
+  min-height: 56px;
+  overflow-x: auto;
+}
+
+/* ── Ribbon Group ────────────────────────────────── */
+
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+}
+
+.ribbon-group-items {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.ribbon-group-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  padding-top: 1px;
+}
+
+.ribbon-separator {
+  width: 1px;
+  align-self: stretch;
+  background-color: var(--border);
+  margin: 4px 4px;
+  flex-shrink: 0;
+}
+
+/* ── Ribbon Button (large) ───────────────────────── */
+
+.ribbon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+  min-width: 42px;
+}
+
+.ribbon-btn:hover {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-secondary);
+}
+
+.ribbon-btn.active {
+  background-color: var(--btn-secondary-hover);
+  color: var(--text-primary);
+}
+
+.ribbon-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.ribbon-btn-label {
+  font-size: 9px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ── Ribbon Button (small, icon-only) ────────────── */
+
+.ribbon-btn-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.ribbon-btn-sm:hover {
+  background-color: var(--btn-secondary-bg);
+  color: var(--text-secondary);
+}
+
+.ribbon-btn-sm.active {
+  background-color: var(--btn-secondary-hover);
+  color: var(--text-primary);
+}
+
+/* ── Draw Tab — Color Swatches ───────────────────── */
+
+.ribbon-color-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.ribbon-color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 120ms ease, transform 80ms ease;
+}
+
+.ribbon-color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.ribbon-color-swatch.active {
+  border-color: var(--text-primary);
+}
+
+/* ── Draw Tab — Size Buttons ─────────────────────── */
+
+.ribbon-size-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.ribbon-size-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.ribbon-size-btn:hover {
+  background-color: var(--btn-secondary-bg);
+}
+
+.ribbon-size-btn.active {
+  background-color: var(--btn-secondary-hover);
+}
+
+.ribbon-size-dot {
+  display: block;
+  border-radius: 50%;
+  background-color: var(--text-secondary);
+}

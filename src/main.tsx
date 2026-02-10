@@ -5,6 +5,7 @@ import App from './App';
 import './styles/reset.css';
 import './styles/theme.css';
 import './styles/app.css';
+import './styles/ribbon.css';
 import './styles/editor.css';
 
 createRoot(document.getElementById('root')!).render(

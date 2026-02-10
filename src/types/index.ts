@@ -59,6 +59,10 @@ export interface StrataAPI {
   getConnections: () => Promise<Connection[]>;
   addConnection: (conn: Connection) => Promise<void>;
   removeConnection: (from: string, to: string) => Promise<void>;
+  windowMinimize: () => Promise<void>;
+  windowMaximize: () => Promise<void>;
+  windowClose: () => Promise<void>;
+  windowIsMaximized: () => Promise<boolean>;
 }
 
 declare global {

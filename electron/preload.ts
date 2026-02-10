@@ -20,6 +20,10 @@ const api: StrataAPI = {
   getConnections: () => ipcRenderer.invoke('get-connections'),
   addConnection: (conn) => ipcRenderer.invoke('add-connection', conn),
   removeConnection: (from, to) => ipcRenderer.invoke('remove-connection', from, to),
+  windowMinimize: () => ipcRenderer.invoke('window-minimize'),
+  windowMaximize: () => ipcRenderer.invoke('window-maximize'),
+  windowClose: () => ipcRenderer.invoke('window-close'),
+  windowIsMaximized: () => ipcRenderer.invoke('window-is-maximized'),
 };
 
 contextBridge.exposeInMainWorld('strata', api);

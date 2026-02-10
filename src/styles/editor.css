@@ -7,32 +7,91 @@
   min-height: 0;
 }
 
+/* ── Structure-Driven Editor Body ─────────────────────────────── */
+
+/* Thought: softer contrast, contemplative */
+.editor[data-structure="thought"] .md-editor-preview {
+  color: var(--text-secondary);
+}
+
+.editor[data-structure="thought"] .md-editor-preview strong {
+  color: var(--text-primary);
+}
+
+/* Idea: accent-highlighted headings */
+.editor[data-structure="idea"] .md-editor-preview h1,
+.editor[data-structure="idea"] .md-editor-preview h2,
+.editor[data-structure="idea"] .md-editor-preview h3 {
+  color: var(--signal-idea);
+}
+
+/* System: tighter line-height, mono hints */
+.editor[data-structure="system"] .md-editor-preview {
+  line-height: 1.55;
+}
+
+.editor[data-structure="system"] .md-editor-preview li {
+  font-family: 'Consolas', 'Monaco', 'Fira Code', monospace;
+  font-size: 14px;
+}
+
+/* Decision: heavier headings, confirmation feel */
+.editor[data-structure="decision"] .md-editor-preview h1,
+.editor[data-structure="decision"] .md-editor-preview h2 {
+  font-weight: 700;
+  color: var(--signal-decision);
+}
+
+.editor[data-structure="decision"] .md-editor-preview strong {
+  color: var(--signal-decision);
+}
+
+/* Insight: warm tone */
+.editor[data-structure="insight"] .md-editor-preview blockquote {
+  border-left-color: var(--signal-insight);
+  color: var(--text-primary);
+}
+
+.editor[data-structure="insight"] .md-editor-preview h1,
+.editor[data-structure="insight"] .md-editor-preview h2,
+.editor[data-structure="insight"] .md-editor-preview h3 {
+  color: var(--signal-insight);
+}
+
+/* Question: italic body emphasis */
+.editor[data-structure="question"] .md-editor-preview blockquote {
+  font-style: normal;
+  color: var(--text-primary);
+  border-left-color: var(--signal-question);
+}
+
 /* ── Mode Toggle ───────────────────────────────────────────────── */
 
 .md-editor-mode-toggle {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   flex-shrink: 0;
-  margin-bottom: 16px;
 }
 
 .md-mode-btn {
-  padding: 3px 10px;
+  padding: 4px 12px;
   font-size: 11px;
   font-weight: 500;
-  border-radius: var(--radius);
+  border-radius: 6px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: color var(--transition), background-color var(--transition);
+  transition: color 140ms ease, background-color 140ms ease;
 }
 
 .md-mode-btn:hover {
   color: var(--text-secondary);
+  background-color: var(--btn-secondary-bg);
 }
 
 .md-mode-btn.active {
-  color: var(--text-primary);
-  background-color: var(--bg-surface);
+  color: var(--btn-primary-text);
+  background-color: var(--btn-primary-bg);
+  font-weight: 600;
 }
 
 /* ── Editor Body ───────────────────────────────────────────────── */

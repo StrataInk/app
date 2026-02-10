@@ -38,17 +38,30 @@
 
   /* ── Accent ────────────────────────────────────── */
   --accent: #81a1c1;
+  --accent-yellow: #e2c87a;
+  --accent-yellow-muted: rgba(226, 200, 122, 0.12);
+  --accent-pink: #c9879a;
+  --accent-pink-muted: rgba(201, 135, 154, 0.12);
 
   /* ── Signal Accents (structure-specific, used sparingly) ── */
   --signal-thought: #81a1c1;
-  --signal-idea: #ebcb8b;
-  --signal-question: #b48ead;
+  --signal-idea: #e2c87a;
+  --signal-question: #c9879a;
   --signal-decision: #a3be8c;
   --signal-system: #8fbcbb;
   --signal-insight: #d08770;
 
+  /* ── Button Tokens ──────────────────────────────── */
+  --btn-primary-bg: #d8dee9;
+  --btn-primary-text: #2e3440;
+  --btn-primary-hover: #eceff4;
+  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #d8dee9;
+  --btn-secondary-hover: rgba(255, 255, 255, 0.10);
+  --btn-radius: 8px;
+
   /* ── Border ─────────────────────────────────────── */
-  --border: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.06);
 
   /* ── Pressure ──────────────────────────────────── */
   --pressure-low: #a3be8c;
@@ -56,11 +69,11 @@
   --pressure-high: #bf616a;
 
   /* ── Layout ────────────────────────────────────── */
-  --sidebar-width: 260px;
-  --notelist-width: 340px;
+  --sidebar-width: 220px;
+  --notelist-width: 300px;
   --topbar-height: 44px;
 
   /* ── Shape ─────────────────────────────────────── */
-  --radius: 6px;
+  --radius: 5px;
   --transition: 120ms ease;
 }

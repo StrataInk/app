@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
+import { Pin, PinOff, Trash2, RotateCcw, X } from 'lucide-react';
 import type { Entry, Structure, Pressure } from '../types';
 import { MarkdownEditor, type EditorMode } from '../components/editor/MarkdownEditor';
 
@@ -129,9 +130,11 @@ export function EditorView({
           </span>
           <span style={{ flex: 1 }} />
           <button className="btn btn-primary btn-sm" onClick={() => onRestore(entry.id)}>
+            <RotateCcw size={13} strokeWidth={1.5} />
             Restore
           </button>
           <button className="btn btn-danger btn-sm" onClick={() => onDeletePermanently(entry.id)}>
+            <X size={13} strokeWidth={1.5} />
             Delete forever
           </button>
         </div>
@@ -147,7 +150,7 @@ export function EditorView({
   }
 
   return (
-    <div className="editor">
+    <div className="editor" data-structure={structure} data-pressure={pressure}>
       <input
         className="editor-title"
         type="text"
@@ -157,90 +160,91 @@ export function EditorView({
         autoFocus
       />
 
-      <div className="editor-meta">
-        <label>
-          Structure
-          <select value={structure} onChange={e => handleStructure(e.target.value as Structure)}>
-            {STRUCTURES.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Pressure
-          <select value={pressure} onChange={e => handlePressure(e.target.value as Pressure)}>
-            {PRESSURES.map(p => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Notebook
-          <input
-            type="text"
-            list="notebooks-list"
-            placeholder="None"
-            value={notebook}
-            onChange={e => handleNotebook(e.target.value)}
-          />
-          <datalist id="notebooks-list">
-            {notebooks.map(nb => (
-              <option key={nb} value={nb} />
-            ))}
-          </datalist>
-        </label>
-        <span style={{ flex: 1 }} />
-        <button
-          className="btn btn-ghost btn-sm"
-          onClick={() => entry.pinned ? onUnpin(entry.id) : onPin(entry.id)}
-          title={entry.pinned ? 'Unpin' : 'Pin'}
-        >
-          {entry.pinned ? 'Unpin' : 'Pin'}
-        </button>
-        <button
-          className="btn btn-ghost btn-sm"
-          onClick={() => onTrash(entry.id)}
-        >
-          Trash
-        </button>
-      </div>
-
-      {/* Tags */}
-      <div className="editor-meta" style={{ marginBottom: 12 }}>
-        <label style={{ alignItems: 'flex-start' }}>
-          Tags
-          <div className="tag-input-wrap">
-            {tags.map(tag => (
-              <span key={tag} className="tag-chip">
-                #{tag}
-                <span className="tag-chip-remove" onClick={() => removeTag(tag)}>&times;</span>
-              </span>
-            ))}
+      <div className="editor-chrome">
+        <div className="editor-meta">
+          <label>
+            Structure
+            <select value={structure} onChange={e => handleStructure(e.target.value as Structure)}>
+              {STRUCTURES.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Pressure
+            <select value={pressure} onChange={e => handlePressure(e.target.value as Pressure)}>
+              {PRESSURES.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Notebook
             <input
-              className="tag-input"
               type="text"
-              placeholder="Add tag..."
-              value={tagInput}
-              onChange={e => setTagInput(e.target.value)}
-              onKeyDown={handleTagKeyDown}
-              onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+              list="notebooks-list"
+              placeholder="None"
+              value={notebook}
+              onChange={e => handleNotebook(e.target.value)}
             />
-          </div>
-        </label>
-      </div>
-
-      {/* Mode Toggle */}
-      <div className="md-editor-mode-toggle">
-        {MODES.map(m => (
+            <datalist id="notebooks-list">
+              {notebooks.map(nb => (
+                <option key={nb} value={nb} />
+              ))}
+            </datalist>
+          </label>
+          <span style={{ flex: 1 }} />
           <button
-            key={m}
-            className={`md-mode-btn ${editorMode === m ? 'active' : ''}`}
-            onClick={() => setEditorMode(m)}
-            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => entry.pinned ? onUnpin(entry.id) : onPin(entry.id)}
           >
-            {m.charAt(0).toUpperCase() + m.slice(1)}
+            {entry.pinned ? <PinOff size={13} strokeWidth={1.5} /> : <Pin size={13} strokeWidth={1.5} />}
+            {entry.pinned ? 'Unpin' : 'Pin'}
           </button>
-        ))}
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => onTrash(entry.id)}
+          >
+            <Trash2 size={13} strokeWidth={1.5} />
+            Trash
+          </button>
+        </div>
+
+        <div className="editor-meta">
+          <label style={{ alignItems: 'flex-start' }}>
+            Tags
+            <div className="tag-input-wrap">
+              {tags.map(tag => (
+                <span key={tag} className="tag-chip">
+                  #{tag}
+                  <span className="tag-chip-remove" onClick={() => removeTag(tag)}>&times;</span>
+                </span>
+              ))}
+              <input
+                className="tag-input"
+                type="text"
+                placeholder="Add tag..."
+                value={tagInput}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+              />
+            </div>
+          </label>
+          <span style={{ flex: 1 }} />
+          <div className="md-editor-mode-toggle">
+            {MODES.map(m => (
+              <button
+                key={m}
+                className={`md-mode-btn ${editorMode === m ? 'active' : ''}`}
+                onClick={() => setEditorMode(m)}
+                type="button"
+              >
+                {m.charAt(0).toUpperCase() + m.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <MarkdownEditor

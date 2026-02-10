@@ -175,6 +175,19 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [createEntry]);
 
+  // ── Sync editing state to root for CSS ────────────────────────────
+
+  useEffect(() => {
+    const root = document.getElementById('root');
+    if (root) {
+      if (activeEntry) {
+        root.setAttribute('data-editing', 'true');
+      } else {
+        root.removeAttribute('data-editing');
+      }
+    }
+  }, [activeEntry]);
+
   // ── Render ─────────────────────────────────────────────────────────
 
   return (

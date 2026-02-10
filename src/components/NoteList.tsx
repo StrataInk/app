@@ -57,7 +57,7 @@ export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin
         <div className="notelist-actions">
           {filter.type !== 'trash' && (
             <button className="btn btn-primary btn-sm" onClick={onCreate}>
-              <Plus size={14} />
+              <Plus size={14} strokeWidth={1.5} />
               New
             </button>
           )}
@@ -100,17 +100,17 @@ export function NoteList({ entries, activeId, onSelect, onCreate, onPin, onUnpin
                   <div className="note-card-actions">
                     <button
                       className="note-card-action"
-                      title={entry.pinned ? 'Unpin' : 'Pin'}
                       onClick={(e) => { e.stopPropagation(); entry.pinned ? onUnpin(entry.id) : onPin(entry.id); }}
                     >
-                      {entry.pinned ? <PinOff size={14} /> : <Pin size={14} />}
+                      {entry.pinned ? <PinOff size={12} strokeWidth={1.5} /> : <Pin size={12} strokeWidth={1.5} />}
+                      {entry.pinned ? 'Unpin' : 'Pin'}
                     </button>
                     <button
-                      className="note-card-action"
-                      title="Trash"
+                      className="note-card-action note-card-action--danger"
                       onClick={(e) => { e.stopPropagation(); onTrash(entry.id); }}
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={12} strokeWidth={1.5} />
+                      Trash
                     </button>
                   </div>
                 )}

@@ -18,6 +18,7 @@ interface MarkdownEditorProps {
   entryId: string;
   mode?: EditorMode;
   readOnly?: boolean;
+  onEditorViewRef?: (view: EditorView | null) => void;
 }
 
 export function MarkdownEditor({
@@ -26,6 +27,7 @@ export function MarkdownEditor({
   entryId,
   mode = 'write',
   readOnly = false,
+  onEditorViewRef,
 }: MarkdownEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -91,11 +93,13 @@ export function MarkdownEditor({
     });
 
     viewRef.current = view;
+    onEditorViewRef?.(view);
 
     // Initial preview
     updatePreview(initialMarkdown);
 
     return () => {
+      onEditorViewRef?.(null);
       view.destroy();
       viewRef.current = null;
     };

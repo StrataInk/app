@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, type KeyboardEvent } from 'react';
 import { Pin, PinOff, Trash2, RotateCcw, X } from 'lucide-react';
+import { EditorView as CMEditorView } from '@codemirror/view';
 import type { Entry, Structure, Pressure } from '../types';
 import { MarkdownEditor, type EditorMode } from '../components/editor/MarkdownEditor';
 import type { RibbonCommand } from '../components/Ribbon';
@@ -47,6 +48,15 @@ export function EditorView({
   const [drawSize, setDrawSize] = useState(2);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
+  const cmViewRef = useRef<CMEditorView | null>(null);
+
+  // Refs to avoid stale closures in queueSave
+  const entryRef = useRef(entry);
+  entryRef.current = entry;
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
+  const latestRef = useRef({ title, body, structure, pressure, notebook, tags });
+  latestRef.current = { title, body, structure, pressure, notebook, tags };
 
   // Reset state when entry changes
   useEffect(() => {
@@ -59,21 +69,16 @@ export function EditorView({
     setTagInput('');
   }, [entry.id]);
 
-  const queueSave = (updates: Partial<Entry>) => {
+  const queueSave = useCallback((updates: Partial<Entry>) => {
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(() => {
-      onSave({
-        ...entry,
-        title,
-        body,
-        structure,
-        pressure,
-        notebook,
-        tags,
+      onSaveRef.current({
+        ...entryRef.current,
+        ...latestRef.current,
         ...updates,
       });
     }, 600);
-  };
+  }, []);
 
   const handleTitle = (val: string) => {
     setTitle(val);
@@ -128,8 +133,8 @@ export function EditorView({
   // ── Ribbon Command Handler ─────────────────────────────────────────
 
   const handleRibbonCommand = useCallback((cmd: RibbonCommand) => {
-    // TODO: Wire format/insert commands to CodeMirror when we have a ref
-    // For now, handle insert commands by modifying body directly
+    const view = cmViewRef.current;
+
     if (cmd.type === 'insert') {
       let snippet = '';
       switch (cmd.payload) {
@@ -152,13 +157,19 @@ export function EditorView({
           snippet = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
           break;
       }
-      if (snippet) {
-        const newBody = body + snippet;
-        setBody(newBody);
-        queueSave({ body: newBody });
+      if (snippet && view) {
+        const cursor = view.state.selection.main.head;
+        view.dispatch({
+          changes: { from: cursor, insert: snippet },
+          selection: { anchor: cursor + snippet.length },
+        });
+        view.focus();
       }
     } else if (cmd.type === 'format') {
-      // Wrap selection or append format markers
+      if (!view) return;
+      const { from, to } = view.state.selection.main;
+      const selected = view.state.sliceDoc(from, to);
+
       let prefix = '';
       let suffix = '';
       switch (cmd.payload) {
@@ -167,18 +178,43 @@ export function EditorView({
         case 'underline': prefix = '<u>'; suffix = '</u>'; break;
         case 'strikethrough': prefix = '~~'; suffix = '~~'; break;
         case 'highlight': prefix = '=='; suffix = '=='; break;
-        case 'h1': prefix = '\n# '; break;
-        case 'h2': prefix = '\n## '; break;
-        case 'h3': prefix = '\n### '; break;
-        case 'bullet-list': prefix = '\n- '; break;
-        case 'ordered-list': prefix = '\n1. '; break;
-        case 'task-list': prefix = '\n- [ ] '; break;
+        case 'h1': prefix = '# '; break;
+        case 'h2': prefix = '## '; break;
+        case 'h3': prefix = '### '; break;
+        case 'bullet-list': prefix = '- '; break;
+        case 'ordered-list': prefix = '1. '; break;
+        case 'task-list': prefix = '- [ ] '; break;
         case 'paragraph': break;
       }
       if (prefix || suffix) {
-        const newBody = body + prefix + (suffix ? 'text' + suffix : '');
-        setBody(newBody);
-        queueSave({ body: newBody });
+        const wrapped = prefix + (selected || 'text') + suffix;
+        view.dispatch({
+          changes: { from, to, insert: wrapped },
+          selection: { anchor: from + wrapped.length },
+        });
+        view.focus();
+      }
+    } else if (cmd.type === 'copy' || cmd.type === 'cut' || cmd.type === 'paste') {
+      if (!view) return;
+      const { from, to } = view.state.selection.main;
+      const selected = view.state.sliceDoc(from, to);
+      if (cmd.type === 'copy') {
+        if (selected) navigator.clipboard.writeText(selected);
+      } else if (cmd.type === 'cut') {
+        if (selected) {
+          navigator.clipboard.writeText(selected);
+          view.dispatch({ changes: { from, to, insert: '' } });
+        }
+      } else if (cmd.type === 'paste') {
+        navigator.clipboard.readText().then(text => {
+          if (text) {
+            view.dispatch({
+              changes: { from, to, insert: text },
+              selection: { anchor: from + text.length },
+            });
+            view.focus();
+          }
+        });
       }
     } else if (cmd.type === 'draw-tool') {
       setDrawTool(cmd.payload as DrawTool);
@@ -187,7 +223,7 @@ export function EditorView({
     } else if (cmd.type === 'draw-size') {
       setDrawSize(Number(cmd.payload));
     }
-  }, [body]);
+  }, []);
 
   useEffect(() => {
     onRibbonCommandRef(handleRibbonCommand);
@@ -318,6 +354,7 @@ export function EditorView({
           onChange={handleBody}
           entryId={entry.id}
           mode={editorMode}
+          onEditorViewRef={(v) => { cmViewRef.current = v; }}
         />
         {drawingActive && (
           <DrawCanvas tool={drawTool} color={drawColor} size={drawSize} />

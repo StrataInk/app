@@ -206,21 +206,24 @@
 .section-tabs {
   display: flex;
   align-items: stretch;
-  height: 32px;
-  min-height: 32px;
+  height: 38px;
+  min-height: 38px;
   padding: 0 16px;
-  background-color: var(--bg-list);
+  background-color: var(--bg-sidebar);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   flex-shrink: 0;
-  gap: 0;
+  gap: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+  position: relative;
 }
 
 .section-tab {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  font-size: 11px;
+  padding: 0 18px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
   border: none;
@@ -228,27 +231,29 @@
   cursor: pointer;
   position: relative;
   white-space: nowrap;
-  transition: color var(--transition);
+  transition: color var(--transition), background-color var(--transition);
+  border-radius: 6px 6px 0 0;
 }
 
 .section-tab:hover {
   color: var(--text-secondary);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .section-tab.active {
-  color: var(--text-primary);
+  color: var(--text-heading);
   font-weight: 600;
+  background-color: var(--bg-list);
 }
 
 .section-tab::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 8px;
-  right: 8px;
+  left: 0;
+  right: 0;
   height: 2px;
   background-color: var(--accent);
-  border-radius: 1px 1px 0 0;
   transform: scaleX(0);
   transition: transform 150ms ease;
 }
@@ -275,13 +280,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 10px 14px;
   flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .notelist-info {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
 }
 
 .notelist-actions {
@@ -299,7 +307,7 @@
 /* ── Note Card — Inkdrop style ─────────────────────── */
 
 .note-card {
-  padding: 8px 12px 8px 14px;
+  padding: 10px 12px 10px 14px;
   border-radius: var(--radius);
   cursor: pointer;
   transition: background-color var(--transition);
@@ -308,6 +316,7 @@
   gap: 4px;
   position: relative;
   border-left: 2px solid transparent;
+  margin-bottom: 1px;
 }
 
 .note-card[data-structure="thought"] { border-left-color: var(--signal-thought); }
@@ -323,16 +332,16 @@
 
 .note-card.selected {
   background-color: var(--bg-surface-active);
+  border-left-color: var(--accent);
 }
 
 .note-card.selected::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 6px;
-  bottom: 6px;
+  top: 0;
+  bottom: 0;
   width: 2px;
-  border-radius: 1px;
   background-color: var(--accent);
 }
 
@@ -354,6 +363,7 @@
 
 .note-card.selected .note-card-title {
   color: var(--text-heading);
+  font-weight: 600;
 }
 
 .note-card-pin {
@@ -712,34 +722,10 @@
   gap: 4px;
 }
 
-.editor-header-divider {
-  width: 1px;
-  height: 18px;
-  background-color: var(--border);
-  margin: 0 6px;
-  flex-shrink: 0;
-}
-
 .editor-header-right {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.signal-group {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-
-.signal-label {
-  font-size: 9px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  line-height: 1;
+  gap: 6px;
 }
 
 .editor-action-btn {
@@ -767,14 +753,14 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 10px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background-color var(--transition), color var(--transition);
+  transition: background-color var(--transition), color var(--transition), box-shadow var(--transition);
   border: 1px solid transparent;
 }
 
@@ -803,17 +789,31 @@
 .signal-pressure {
   color: var(--text-secondary);
   background-color: var(--bg-surface);
+  border-color: var(--border);
 }
 
 .signal-pressure-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
+.signal-pressure[data-pressure="low"] {
+  border-color: rgba(163, 190, 140, 0.2);
+}
 .signal-pressure[data-pressure="low"] .signal-pressure-dot { background-color: var(--pressure-low); }
+
+.signal-pressure[data-pressure="medium"] {
+  border-color: rgba(235, 203, 139, 0.2);
+}
 .signal-pressure[data-pressure="medium"] .signal-pressure-dot { background-color: var(--pressure-medium); }
+
+.signal-pressure[data-pressure="high"] {
+  color: var(--text-primary);
+  border-color: rgba(191, 97, 106, 0.25);
+  background-color: rgba(191, 97, 106, 0.06);
+}
 .signal-pressure[data-pressure="high"] .signal-pressure-dot { background-color: var(--pressure-high); }
 
 .signal-pressure:hover {

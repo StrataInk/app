@@ -292,37 +292,30 @@ export function EditorView({
               <Trash2 size={14} strokeWidth={1.5} />
             </button>
           </div>
-          <span className="editor-header-divider" />
           <div className="editor-header-right">
-            <div className="signal-group">
-              <span className="signal-label">Structure</span>
-              <button
-                className="signal-control signal-structure"
-                data-structure={structure}
-                onClick={() => {
-                  const idx = STRUCTURES.indexOf(structure);
-                  handleStructure(STRUCTURES[(idx + 1) % STRUCTURES.length]);
-                }}
-                title={`Structure: ${structure} (click to change)`}
-              >
-                {structure}
-              </button>
-            </div>
-            <div className="signal-group">
-              <span className="signal-label">Pressure</span>
-              <button
-                className="signal-control signal-pressure"
-                data-pressure={pressure}
-                onClick={() => {
-                  const idx = PRESSURES.indexOf(pressure);
-                  handlePressure(PRESSURES[(idx + 1) % PRESSURES.length]);
-                }}
-                title={`Pressure: ${pressure} (click to change)`}
-              >
-                <span className="signal-pressure-dot" />
-                {pressure}
-              </button>
-            </div>
+            <button
+              className="signal-control signal-structure"
+              data-structure={structure}
+              onClick={() => {
+                const idx = STRUCTURES.indexOf(structure);
+                handleStructure(STRUCTURES[(idx + 1) % STRUCTURES.length]);
+              }}
+              title={`Structure: ${structure} (click to cycle)`}
+            >
+              {structure}
+            </button>
+            <button
+              className="signal-control signal-pressure"
+              data-pressure={pressure}
+              onClick={() => {
+                const idx = PRESSURES.indexOf(pressure);
+                handlePressure(PRESSURES[(idx + 1) % PRESSURES.length]);
+              }}
+              title={`Pressure: ${pressure} (click to cycle)`}
+            >
+              <span className="signal-pressure-dot" />
+              {pressure}
+            </button>
           </div>
         </div>
 

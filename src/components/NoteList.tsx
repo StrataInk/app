@@ -16,7 +16,7 @@ interface NoteListProps {
 
 function filterLabel(filter: SidebarFilter): string {
   switch (filter.type) {
-    case 'all': return 'All Notes';
+    case 'all': return 'Pages';
     case 'pinned': return 'Pinned';
     case 'archive': return 'Archive';
     case 'trash': return 'Trash';

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { usePreferences } from '../state/PreferencesContext';
 import { Toast } from '../components/Toast';
+import { isWeb } from '../lib/env';
 import type { Preferences } from '../state/preferences';
 
 type SettingsTab = 'general' | 'editor' | 'appearance' | 'storage' | 'about';
@@ -23,7 +24,6 @@ export function SettingsView() {
   const [vaultPath, setVaultPath] = useState('');
   const [showToast, setShowToast] = useState(false);
   const { prefs, update } = usePreferences();
-  const isWeb = !!(window as unknown as Record<string, unknown>).__STRATA_WEB__;
 
   const updateWithToast = useCallback((partial: Partial<Preferences>) => {
     update(partial);

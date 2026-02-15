@@ -73,6 +73,8 @@ export function EditorView({
   onSaveRef.current = onSave;
   const latestRef = useRef({ title, body, structure, pressure, notebook, tags });
   latestRef.current = { title, body, structure, pressure, notebook, tags };
+  const autosaveDelayRef = useRef(Number(prefs.autosaveInterval) || 600);
+  autosaveDelayRef.current = Number(prefs.autosaveInterval) || 600;
 
   // Reset state when entry changes
   useEffect(() => {
@@ -93,7 +95,7 @@ export function EditorView({
         ...latestRef.current,
         ...updates,
       });
-    }, 600);
+    }, autosaveDelayRef.current);
   }, []);
 
   const handleTitle = (val: string) => {

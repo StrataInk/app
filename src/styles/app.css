@@ -803,7 +803,7 @@
 
 .editor {
   width: 100%;
-  max-width: 720px;
+  max-width: var(--editor-max-width);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1437,6 +1437,11 @@
 
 .settings-select:focus {
   border-color: rgba(129, 161, 193, 0.3);
+}
+
+.settings-select option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* ── Toggle Switch ────────────────────────────────── */

@@ -4,6 +4,7 @@ import {
   Home, PlusSquare, Pen, Eye, Menu,
 } from 'lucide-react';
 import type { RibbonTab } from './Ribbon';
+import { isWeb } from '../lib/env';
 
 interface TitleBarProps {
   ribbonCollapsed: boolean;
@@ -30,7 +31,6 @@ export function TitleBar({
   onToggleSidebar,
 }: TitleBarProps) {
   const [maximized, setMaximized] = useState(false);
-  const isWeb = !!(window as unknown as Record<string, unknown>).__STRATA_WEB__;
 
   useEffect(() => {
     window.strata.windowIsMaximized().then(setMaximized);
